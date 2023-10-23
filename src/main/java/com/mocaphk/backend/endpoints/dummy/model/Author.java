@@ -1,4 +1,4 @@
-package com.mocaphk.backend.dummy.model;
+package com.mocaphk.backend.endpoints.dummy.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

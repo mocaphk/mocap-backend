@@ -3,6 +3,7 @@ package com.mocaphk.backend;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 // remove the exclusion of DataSourceAutoConfiguration to enable the database
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
