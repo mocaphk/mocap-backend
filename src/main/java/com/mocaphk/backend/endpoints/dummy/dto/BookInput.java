@@ -1,4 +1,4 @@
-package com.mocaphk.backend.dummy.dto;
+package com.mocaphk.backend.endpoints.dummy.dto;
 
 public record BookInput(
         String name,

@@ -1,8 +1,8 @@
-package com.mocaphk.backend.dummy.service;
+package com.mocaphk.backend.endpoints.dummy.service;
 
-import com.mocaphk.backend.dummy.dto.BookInput;
-import com.mocaphk.backend.dummy.model.Author;
-import com.mocaphk.backend.dummy.model.Book;
+import com.mocaphk.backend.endpoints.dummy.dto.BookInput;
+import com.mocaphk.backend.endpoints.dummy.model.Author;
+import com.mocaphk.backend.endpoints.dummy.model.Book;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

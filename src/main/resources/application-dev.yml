@@ -1,0 +1,32 @@
+#spring.datasource.url=jdbc:postgresql://localhost:5432/<YOUR_DATABASE_NAME>
+#spring.datasource.username=<YOUR_USERNAME>
+#spring.datasource.password=<YOUR_PASSWORD>
+#spring.jpa.hibernate.ddl-auto=<create | create-drop | update | validate | none>
+#spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+
+frontend:
+  uri: 'http://localhost:3000'
+
+server:
+  servlet:
+    context-path: '/'
+  port: '8080'
+
+logging:
+  level:
+    com:
+      mocaphk:
+        backend: 'DEBUG'
+
+keycloak:
+  uri: 'http://localhost:8888'
+  realm: 'mocap'
+  clientId: 'mocap-backend'
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: '${keycloak.uri}/realms/${keycloak.realm}'
+          jwk-set-uri: '${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs'
