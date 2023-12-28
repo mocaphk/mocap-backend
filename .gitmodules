@@ -1,0 +1,3 @@
+[submodule "src/main/resources/graphql/mocap-schema"]
+	path = src/main/resources/graphql/mocap-schema
+	url = git@github.com:mocaphk/mocap-schema.git
