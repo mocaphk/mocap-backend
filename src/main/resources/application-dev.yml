@@ -23,6 +23,14 @@ keycloak:
   realm: 'mocap'
   clientId: 'mocap-backend'
 
+docker:
+  # if you are using unix socket to connect to docker daemon, this should work
+  # otherwise, (only in dev) you can configure remote access: https://docs.docker.com/config/daemon/remote-access/
+  host: 'unix:///var/run/docker.sock'
+  # select your place to store temporary files
+  tempDockerfileDir: '/tmp/files/dockerfiles'
+  tempSourceDir: '/tmp/files/source'
+
 spring:
   security:
     oauth2:

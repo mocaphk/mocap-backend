@@ -17,6 +17,11 @@ keycloak:
   realm: 'mocap'
   clientId: 'mocap-backend'
 
+docker:
+  host: 'unix:///var/run/docker.sock'
+  tempDockerfileDir: '/tmp/files/dockerfiles'
+  tempSourceDir: '/tmp/files/source'
+
 spring:
   security:
     oauth2:
