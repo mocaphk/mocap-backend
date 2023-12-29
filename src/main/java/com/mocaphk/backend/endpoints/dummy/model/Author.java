@@ -1,12 +1,16 @@
 package com.mocaphk.backend.endpoints.dummy.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import jakarta.persistence.*;
+import lombok.*;
 
-@Data
-@AllArgsConstructor
+@Entity
+@NoArgsConstructor
+@Getter
+@Setter
 public class Author {
-    private String id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String firstName;
     private String lastName;
 }
