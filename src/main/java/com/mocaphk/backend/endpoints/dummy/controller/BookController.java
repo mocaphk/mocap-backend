@@ -25,7 +25,7 @@ public class BookController {
 
     @RolesAllowed({ Roles.ADMIN, Roles.LECTURER })
     @QueryMapping(name = "book")
-    public Book getBookById(@Argument String id) {
+    public Book getBookById(@Argument Long id) {
         log.debug("getBookById: {}", id);
         return bookService.getBookById(id);
     }

@@ -1,16 +1,23 @@
 package com.mocaphk.backend.endpoints.dummy.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import lombok.*;
 
-@Data
-@AllArgsConstructor
+@Entity
+@NoArgsConstructor
+@Getter
+@Setter
 public class Book {
-    private String id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String name;
-    private int pageCount;
-    private String authorId;
+    private Integer pageCount;
+    private Long authorId;
 
     // Not exposing to graphql
-    private String secret;
+    private Long secret;
 }

@@ -1,0 +1,35 @@
+frontend:
+  uri: 'http://localhost:3000'
+
+server:
+  servlet:
+    context-path: '/'
+  port: '8080'
+
+logging:
+  level:
+    com:
+      mocaphk:
+        backend: 'DEBUG'
+
+keycloak:
+  uri: 'http://localhost:8888'
+  realm: 'mocap'
+  clientId: 'mocap-backend'
+
+spring:
+  security:
+    # disable security for testing
+    basic:
+      enabled: false
+  datasource:
+    url: 'jdbc:postgresql://localhost:5432/mocap'
+    username: '${DATABASE_USERNAME}'
+    password: '${DATABASE_PASSWORD}'
+  jpa:
+    hibernate:
+      ddl-auto: 'update'
+    properties:
+      hibernate:
+        dialect: 'org.hibernate.dialect.PostgreSQLDialect'
+        default_schema: 'test'
