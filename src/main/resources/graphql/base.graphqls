@@ -1,6 +1,0 @@
-"""
-Add any common types to this file
-"""
-type Query
-
-type Mutation
