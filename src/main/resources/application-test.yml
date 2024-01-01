@@ -14,7 +14,7 @@ logging:
 
 keycloak:
   uri: 'http://localhost:8888'
-  realm: 'mocap'
+  realm: 'mocap-dev'
   clientId: 'mocap-backend'
 
 spring:
