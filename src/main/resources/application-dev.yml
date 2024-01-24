@@ -1,5 +1,5 @@
 frontend:
-  uri: 'http://localhost:3000'
+  uri: '${FRONTEND_URI}'
 
 server:
   servlet:
