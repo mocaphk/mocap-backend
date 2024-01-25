@@ -1,5 +1,5 @@
 frontend:
-  uri: 'http://localhost:3000'
+  uri: '${FRONTEND_URI}'
 
 server:
   servlet:
@@ -7,7 +7,7 @@ server:
   port: '8080'
 
 keycloak:
-  uri: 'http://mocap-keycloak:8080'
+  uri: 'http://mocap-keycloak:8080/keycloak'
   realm: 'mocap-dev'
   clientId: 'mocap-backend'
 
@@ -24,7 +24,7 @@ spring:
           issuer-uri: '${keycloak.uri}/realms/${keycloak.realm}'
           jwk-set-uri: '${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs'
   datasource:
-    url: 'jdbc:postgresql://host.docker.internal:5432/mocap'
+    url: 'jdbc:postgresql://mocap-database:5432/mocap'
     username: '${DATABASE_USERNAME}'
     password: '${DATABASE_PASSWORD}'
   jpa:

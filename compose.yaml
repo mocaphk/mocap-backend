@@ -14,8 +14,6 @@ services:
             - mocap
         ports:
             - 8000:8080
-        extra_hosts:
-            - "host.docker.internal:host-gateway"
         restart: always
         command: java -jar app.jar
 networks:
