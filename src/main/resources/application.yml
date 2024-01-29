@@ -1,34 +1,34 @@
 frontend:
-  uri: '${FRONTEND_URI}'
+    uri: "${FRONTEND_URI}"
 
 server:
-  servlet:
-    context-path: '/'
-  port: '8080'
+    servlet:
+        context-path: "/"
+    port: "8080"
 
 keycloak:
-  uri: 'http://mocap-keycloak:8080/keycloak'
-  realm: 'mocap-dev'
-  clientId: 'mocap-backend'
+    uri: "http://mocap-keycloak:8080"
+    realm: "mocap-dev"
+    clientId: "mocap-backend"
 
 docker:
-  host: 'unix:///var/run/docker.sock'
-  tempDockerfileDir: '/tmp/files/dockerfiles'
-  tempSourceDir: '/tmp/files/source'
+    host: "unix:///var/run/docker.sock"
+    tempDockerfileDir: "/tmp/files/dockerfiles"
+    tempSourceDir: "/tmp/files/source"
 
 spring:
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: '${keycloak.uri}/realms/${keycloak.realm}'
-          jwk-set-uri: '${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs'
-  datasource:
-    url: 'jdbc:postgresql://mocap-database:5432/mocap'
-    username: '${DATABASE_USERNAME}'
-    password: '${DATABASE_PASSWORD}'
-  jpa:
-    properties:
-      hibernate:
-        dialect: 'org.hibernate.dialect.PostgreSQLDialect'
-        default_schema: 'public'
+    security:
+        oauth2:
+            resourceserver:
+                jwt:
+                    issuer-uri: "${keycloak.uri}/realms/${keycloak.realm}"
+                    jwk-set-uri: "${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs"
+    datasource:
+        url: "jdbc:postgresql://mocap-database:5432/mocap"
+        username: "${DATABASE_USERNAME}"
+        password: "${DATABASE_PASSWORD}"
+    jpa:
+        properties:
+            hibernate:
+                dialect: "org.hibernate.dialect.PostgreSQLDialect"
+                default_schema: "public"

@@ -1,45 +1,45 @@
 frontend:
-  uri: '${FRONTEND_URI}'
+    uri: "${FRONTEND_URI}"
 
 server:
-  servlet:
-    context-path: '/'
-  port: '8000'
+    servlet:
+        context-path: "/"
+    port: "8000"
 
 logging:
-  level:
-    com:
-      mocaphk:
-        backend: 'DEBUG'
+    level:
+        com:
+            mocaphk:
+                backend: "DEBUG"
 
 keycloak:
-  uri: 'http://localhost:8888'
-  realm: 'mocap-dev'
-  clientId: 'mocap-backend'
+    uri: "http://localhost:8888"
+    realm: "mocap-dev"
+    clientId: "mocap-backend"
 
 docker:
-  # if you are using unix socket to connect to docker daemon, this should work
-  # otherwise, (only in dev) you can configure remote access: https://docs.docker.com/config/daemon/remote-access/
-  host: 'unix:///var/run/docker.sock'
-  # select your place to store temporary files
-  tempDockerfileDir: '/tmp/files/dockerfiles'
-  tempSourceDir: '/tmp/files/source'
+    # if you are using unix socket to connect to docker daemon, this should work
+    # otherwise, (only in dev) you can configure remote access: https://docs.docker.com/config/daemon/remote-access/
+    host: "unix:///var/run/docker.sock"
+    # select your place to store temporary files
+    tempDockerfileDir: "/tmp/files/dockerfiles"
+    tempSourceDir: "/tmp/files/source"
 
 spring:
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: '${keycloak.uri}/realms/${keycloak.realm}'
-          jwk-set-uri: '${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs'
-  datasource:
-    url: 'jdbc:postgresql://localhost:5432/mocap'
-    username: '${DATABASE_USERNAME}'
-    password: '${DATABASE_PASSWORD}'
-  jpa:
-    hibernate:
-      ddl-auto: 'update'
-    properties:
-      hibernate:
-        dialect: 'org.hibernate.dialect.PostgreSQLDialect'
-        default_schema: 'dev'
+    security:
+        oauth2:
+            resourceserver:
+                jwt:
+                    issuer-uri: "${keycloak.uri}/realms/${keycloak.realm}"
+                    jwk-set-uri: "${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs"
+    datasource:
+        url: "jdbc:postgresql://localhost:5432/mocap"
+        username: "${DATABASE_USERNAME}"
+        password: "${DATABASE_PASSWORD}"
+    jpa:
+        hibernate:
+            ddl-auto: "update"
+        properties:
+            hibernate:
+                dialect: "org.hibernate.dialect.PostgreSQLDialect"
+                default_schema: "dev"
