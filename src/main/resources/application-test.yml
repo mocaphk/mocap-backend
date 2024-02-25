@@ -23,9 +23,15 @@ spring:
         basic:
             enabled: false
     datasource:
-        url: "jdbc:postgresql://localhost:5432/mocap"
-        username: "${DATABASE_USERNAME}"
-        password: "${DATABASE_PASSWORD}"
+        mocap:
+            url: "jdbc:postgresql://localhost:5432/mocap"
+            username: "${DATABASE_USERNAME}"
+            password: "${DATABASE_PASSWORD}"
+        keycloak:
+            url: "jdbc:postgresql://localhost:5432/keycloak"
+            username: "${DATABASE_USERNAME}"
+            password: "${DATABASE_PASSWORD}"
+            schema: public
     jpa:
         hibernate:
             ddl-auto: "update"

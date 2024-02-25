@@ -1,8 +1,8 @@
 package com.mocaphk.backend.endpoints;
 
-import com.mocaphk.backend.endpoints.dummy.controller.BookController;
-import com.mocaphk.backend.endpoints.dummy.dto.AuthorInput;
-import com.mocaphk.backend.endpoints.dummy.dto.BookInput;
+import com.mocaphk.backend.endpoints.mocap.dummy.controller.BookController;
+import com.mocaphk.backend.endpoints.mocap.dummy.dto.AuthorInput;
+import com.mocaphk.backend.endpoints.mocap.dummy.dto.BookInput;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
