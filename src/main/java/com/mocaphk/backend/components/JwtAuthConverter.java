@@ -26,7 +26,6 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
 
     @Value("${keycloak.clientId}")
     private String clientId;
-    private final String principleAttribute = "preferred_username";
     private final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter =
             new JwtGrantedAuthoritiesConverter();
 
@@ -39,18 +38,16 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
                 extractResourceRoles(jwt)
                         .stream()
                 ).collect(Collectors.toSet());
+        // we use id as name
         return new JwtAuthenticationToken(
                 jwt,
                 authorities,
-                getPrincipleClaimName(jwt)
+                getId(jwt)
                 );
     }
 
-    private String getPrincipleClaimName(Jwt jwt) {
+    private String getId(Jwt jwt) {
         String claimName = JwtClaimNames.SUB;
-        if (principleAttribute != null) {
-            claimName = principleAttribute;
-        }
         return jwt.getClaim(claimName);
     }
 

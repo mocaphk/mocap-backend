@@ -24,9 +24,15 @@ spring:
                     issuer-uri: "${keycloak.uri}/realms/${keycloak.realm}"
                     jwk-set-uri: "${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs"
     datasource:
-        url: "jdbc:postgresql://mocap-database:5432/mocap"
-        username: "${DATABASE_USERNAME}"
-        password: "${DATABASE_PASSWORD}"
+        mocap:
+            url: "jdbc:postgresql://mocap-database:5432/mocap"
+            username: "${DATABASE_USERNAME}"
+            password: "${DATABASE_PASSWORD}"
+        keycloak:
+            url: "jdbc:postgresql://mocap-database:5432/keycloak"
+            username: "${DATABASE_USERNAME}"
+            password: "${DATABASE_PASSWORD}"
+            schema: public
     jpa:
         properties:
             hibernate:
