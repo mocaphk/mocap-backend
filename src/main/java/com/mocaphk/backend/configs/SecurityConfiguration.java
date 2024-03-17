@@ -36,8 +36,7 @@ public class SecurityConfiguration {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.cors();
         return http.build();
-    }    
-
+    }
 
     // https://keycloak.discourse.group/t/invalid-token-on-docker-an-error-occurred-while-attempting-to-decode-the-jwt-invalid-token/16532
     @Bean
