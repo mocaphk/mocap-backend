@@ -22,7 +22,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import com.mocaphk.backend.enums.CheckingMethod;
+import org.springframework.transaction.annotation.Transactional;
+
 @Service
+@Transactional
 @Slf4j
 @RequiredArgsConstructor
 public class CodeExecutionService {
@@ -37,11 +40,11 @@ public class CodeExecutionService {
 
     // TODO: store result, add controller
 
-    public AttemptResult runAttempt(String userId, Long attemptId) throws IOException {
+    public AttemptResult runAttempt(Long attemptId) throws IOException {
         Attempt attempt = attemptService.getAttemptById(attemptId);
         Question question = attempt.getQuestion();
         List<Testcase> testcases = question.getTestcases();
-        List<CustomTestcase> customTestcases = testcaseService.getCustomTestcasesByQuestionId(userId, question.getId());
+        List<CustomTestcase> customTestcases = testcaseService.getCustomTestcasesByQuestionId(attempt.getUserId(), question.getId());
         CodingEnvironment codingEnvironment = question.getCodingEnvironment();
         if (codingEnvironment == null || !codingEnvironment.getIsBuilt()) {
             log.error("Coding environment not found or not built");
@@ -50,18 +53,27 @@ public class CodeExecutionService {
 
         AttemptResult attemptResult = new AttemptResult();
         attemptResult.setAttempt(attempt);
-        attemptResult.setResults(new ArrayList<>());
         attemptResult.setCreatedAt(dateTimeFormatter.format(LocalDateTime.now()));
 //        attemptResult = attemptResultRepository.save(attemptResult);
 
-        for (var testcase : Stream.concat(testcases.stream(), customTestcases.stream()).toList()) {
+        List<CodeExecutionResult> results = new ArrayList<>();
+
+        List<BaseTestcase> allTestcases = new ArrayList<>(Stream.concat(testcases.stream(), customTestcases.stream()).toList());
+        if (allTestcases.isEmpty()) {
+            CustomTestcase defaultTestcase = new CustomTestcase();
+            defaultTestcase.setQuestion(question);
+            allTestcases.add(defaultTestcase);
+        }
+
+        for (var testcase : allTestcases) {
             CodeExecutionResult result = execute(attempt.getCode(), question, codingEnvironment, testcase);
             CodeExecutionResult sampleResult = execute(question.getSampleCode(), question, codingEnvironment, testcase);
             testcase.check(result, sampleResult);
             result.setAttemptResultId(attemptResult.getId());
-            attemptResult.getResults().add(result);
+            results.add(result);
 //            codeExecutionResultRepository.save(result);
         }
+        attemptResult.setResults(results);
 
         return attemptResult;
     }
@@ -88,9 +100,10 @@ public class CodeExecutionService {
 
         CodeExecutionResult result = new CodeExecutionResult();
         result.setTestcaseId(testcase.getId());
-        result.setOutput(new ArrayList<>());
         result.setIsExecutionSuccess(true);
         result.setIsExceedTimeLimit(true);
+
+        List<CodeExecutionResult.CodeExecutionOutput> output = new ArrayList<>();
 
         PipedOutputStream stdinWrite = null;
         PipedInputStream stdinRead = null;
@@ -106,13 +119,13 @@ public class CodeExecutionService {
                 new ResultCallback.Adapter<>() {
                     @Override
                     public void onNext(Frame item) {
-                        result.getOutput().add(
+                        output.add(
                                 new CodeExecutionResult.CodeExecutionOutput(
                                         new String(item.getPayload()),
                                         CodeStream.valueOf(item.getStreamType().name())
                                 )
                         );
-                        log.info(new String(item.getPayload()));
+                        log.info(item.toString());
                     }
 
                     @Override
@@ -130,7 +143,7 @@ public class CodeExecutionService {
                 return result;
             }
 
-            if (question.getCheckingMethod() == CheckingMethod.CONSOLE) {
+            if (testcase.getId() != null && question.getCheckingMethod() == CheckingMethod.CONSOLE) {
                 for (TestcaseInputEntry input : testcase.getInput()) {
                     stdinWrite.write(input.getValue().getBytes());
                     stdinWrite.write("\n".getBytes());
@@ -147,6 +160,7 @@ public class CodeExecutionService {
             dockerManager.stopContainer(containerId);
             dockerManager.removeContainer(containerId, true);
         }
+        result.setOutput(output);
         result.setIsExceedTimeLimit(false);
 
         return result;

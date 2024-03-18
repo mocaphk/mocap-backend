@@ -33,6 +33,7 @@ public class CustomTestcase extends BaseTestcase {
         } else if (getQuestion().getCheckingMethod() == CheckingMethod.FUNCTION) {
             // TODO: implement function checking
         }
+        result.setIsCorrect(false);
         return false;
     }
 }
