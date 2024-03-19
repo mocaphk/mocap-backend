@@ -7,7 +7,7 @@ import lombok.Setter;
 
 import java.util.List;
 
-import com.mocaphk.backend.endpoints.mocap.user.model.User;
+import com.mocaphk.backend.endpoints.mocap.user.model.MocapUser;
 
 @Entity
 @NoArgsConstructor
@@ -28,7 +28,7 @@ public class Course {
 
     // TODO: schema map to instructors and students, and coding env
     @ManyToMany(mappedBy = "courses")
-    private List<User> users;
+    private List<MocapUser> users;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Assignment> assignments;

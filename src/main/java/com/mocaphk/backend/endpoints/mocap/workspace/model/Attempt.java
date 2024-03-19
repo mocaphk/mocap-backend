@@ -1,6 +1,6 @@
 package com.mocaphk.backend.endpoints.mocap.workspace.model;
 
-import com.mocaphk.backend.endpoints.mocap.user.model.User;
+import com.mocaphk.backend.endpoints.mocap.user.model.MocapUser;
 
 import com.mocaphk.backend.utils.DateUtils;
 import jakarta.persistence.*;
@@ -24,7 +24,7 @@ public class Attempt {
 
     @ManyToOne
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
-    private User user;
+    private MocapUser user;
 
     @Column(name = "question_id")
     private Long questionId;

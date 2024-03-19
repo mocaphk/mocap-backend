@@ -8,7 +8,7 @@ import lombok.Setter;
 
 import static com.mocaphk.backend.endpoints.mocap.workspace.model.CodeExecutionResult.combineOutput;
 
-import com.mocaphk.backend.endpoints.mocap.user.model.User;
+import com.mocaphk.backend.endpoints.mocap.user.model.MocapUser;
 
 @Entity
 @NoArgsConstructor
@@ -20,7 +20,7 @@ public class CustomTestcase extends BaseTestcase {
 
     @ManyToOne
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
-    private User user;
+    private MocapUser user;
 
     @Override
     public boolean check(CodeExecutionResult result, CodeExecutionResult sampleResult) {
