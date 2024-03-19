@@ -35,7 +35,7 @@ public class DockerManagerTests {
 
         String tempFileName = dockerManager.copyFileToContainer(
                 containerId,
-                "for x in range(10):\n\tprint(x)\ny = input(\"Enter a number: \")\nprint(\"You entered: \", y)\n",
+                "for x in range(10):\n\tprint(x)\ny = input(\"Enter a number: \")\nprint(\"You entered:\", y)\n",
                 "/"
         );
         assertThat(StringUtils.isNotBlank(tempFileName)).isTrue();

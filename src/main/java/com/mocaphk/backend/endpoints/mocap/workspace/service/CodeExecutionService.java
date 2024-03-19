@@ -7,15 +7,15 @@ import com.mocaphk.backend.endpoints.mocap.workspace.model.*;
 import com.mocaphk.backend.endpoints.mocap.workspace.repository.AttemptResultRepository;
 import com.mocaphk.backend.endpoints.mocap.workspace.repository.CodeExecutionResultRepository;
 import com.mocaphk.backend.enums.CodeStream;
+import com.mocaphk.backend.utils.DateUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -36,9 +36,6 @@ public class CodeExecutionService {
     private final AttemptService attemptService;
     private final TestcaseService testcaseService;
     private final DockerManager dockerManager;
-    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
-    // TODO: store result, add controller
 
     public AttemptResult runAttempt(Long attemptId) throws IOException {
         Attempt attempt = attemptService.getAttemptById(attemptId);
@@ -53,12 +50,16 @@ public class CodeExecutionService {
 
         AttemptResult attemptResult = new AttemptResult();
         attemptResult.setAttempt(attempt);
-        attemptResult.setCreatedAt(dateTimeFormatter.format(LocalDateTime.now()));
-//        attemptResult = attemptResultRepository.save(attemptResult);
+        attemptResult.setCreatedAt(DateUtils.now());
 
         List<CodeExecutionResult> results = new ArrayList<>();
 
-        List<BaseTestcase> allTestcases = new ArrayList<>(Stream.concat(testcases.stream(), customTestcases.stream()).toList());
+        List<BaseTestcase> allTestcases = new ArrayList<>(
+                Stream.concat(
+                        testcases.stream(),
+                        customTestcases.stream()
+                ).toList()
+        );
         if (allTestcases.isEmpty()) {
             CustomTestcase defaultTestcase = new CustomTestcase();
             defaultTestcase.setQuestion(question);
@@ -67,12 +68,72 @@ public class CodeExecutionService {
 
         for (var testcase : allTestcases) {
             CodeExecutionResult result = execute(attempt.getCode(), question, codingEnvironment, testcase);
+            attempt.setExecutedAt(DateUtils.now());
             CodeExecutionResult sampleResult = execute(question.getSampleCode(), question, codingEnvironment, testcase);
             testcase.check(result, sampleResult);
             result.setAttemptResultId(attemptResult.getId());
             results.add(result);
-//            codeExecutionResultRepository.save(result);
         }
+        attemptResult.setResults(results);
+
+        return attemptResult;
+    }
+
+    public CodeExecutionResult runTestcase(Long attemptId, Long testcaseId) throws IOException {
+        Attempt attempt = attemptService.getAttemptById(attemptId);
+        Question question = attempt.getQuestion();
+        BaseTestcase testcase = testcaseService.getBaseTestcaseById(testcaseId);
+        if (testcase == null) {
+            log.error("Testcase not found");
+            return null;
+        }
+        CodingEnvironment codingEnvironment = question.getCodingEnvironment();
+        if (codingEnvironment == null || !codingEnvironment.getIsBuilt()) {
+            log.error("Coding environment not found or not built");
+            return null;
+        }
+
+        CodeExecutionResult result = execute(attempt.getCode(), question, codingEnvironment, testcase);
+        CodeExecutionResult sampleResult = execute(question.getSampleCode(), question, codingEnvironment, testcase);
+        testcase.check(result, sampleResult);
+        return result;
+    }
+
+    public AttemptResult submitAttempt(Long attemptId) throws IOException {
+        Attempt attempt = attemptService.getAttemptById(attemptId);
+        Question question = attempt.getQuestion();
+        List<Testcase> testcases = question.getTestcases();
+        CodingEnvironment codingEnvironment = question.getCodingEnvironment();
+        if (codingEnvironment == null || !codingEnvironment.getIsBuilt()) {
+            log.error("Coding environment not found or not built");
+            return null;
+        }
+
+        AttemptResult attemptResult = new AttemptResult();
+        attemptResult.setAttempt(attempt);
+        attemptResult.setCreatedAt(DateUtils.now());
+        attemptResult = attemptResultRepository.save(attemptResult);
+        attempt.setResult(attemptResult);
+
+        List<BaseTestcase> allTestcases = new ArrayList<>(testcases);
+        if (allTestcases.isEmpty()) {
+            CustomTestcase defaultTestcase = new CustomTestcase();
+            defaultTestcase.setQuestion(question);
+            allTestcases.add(defaultTestcase);
+        }
+
+        List<CodeExecutionResult> results = new ArrayList<>();
+
+        for (var testcase : allTestcases) {
+            CodeExecutionResult result = execute(attempt.getCode(), question, codingEnvironment, testcase);
+            attempt.setExecutedAt(DateUtils.now());
+            CodeExecutionResult sampleResult = execute(question.getSampleCode(), question, codingEnvironment, testcase);
+            testcase.check(result, sampleResult);
+            result.setAttemptResultId(attemptResult.getId());
+            codeExecutionResultRepository.save(result);
+            results.add(result);
+        }
+        attempt.setIsSubmitted(true);
         attemptResult.setResults(results);
 
         return attemptResult;
@@ -94,6 +155,10 @@ public class CodeExecutionService {
             CodingEnvironment codingEnvironment,
             BaseTestcase testcase
     ) throws IOException {
+        if (StringUtils.isBlank(code)) {
+            return null;
+        }
+
         String containerId = dockerManager.createContainer(codingEnvironment.getDockerImageId());
         dockerManager.startContainer(containerId);
         String fileName = dockerManager.copyFileToContainer(containerId, code, "/");

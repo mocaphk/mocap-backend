@@ -19,7 +19,7 @@ public class AttemptResult {
     @OneToOne(mappedBy = "result")
     private Attempt attempt;
 
-    @OneToMany(mappedBy = "attemptResult")
+    @OneToMany(mappedBy = "attemptResult", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CodeExecutionResult> results;
 
     private String createdAt;

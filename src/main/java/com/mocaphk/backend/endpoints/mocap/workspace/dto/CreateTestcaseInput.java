@@ -2,11 +2,9 @@ package com.mocaphk.backend.endpoints.mocap.workspace.dto;
 
 import org.springframework.lang.NonNull;
 
-import com.mocaphk.backend.endpoints.mocap.workspace.model.TestcaseInputEntry;
-
 import java.util.List;
 
 public record CreateTestcaseInput (
-        @NonNull List<TestcaseInputEntry> input,
+        @NonNull List<TestcaseInputEntryInput> input,
         String expectedOutput,
         @NonNull Boolean isHidden) { }

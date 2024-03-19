@@ -1,5 +1,6 @@
 package com.mocaphk.backend.endpoints.mocap.workspace.service;
 
+import com.mocaphk.backend.utils.DateUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -9,8 +10,7 @@ import com.mocaphk.backend.endpoints.mocap.workspace.dto.UpdateAttemptInput;
 import com.mocaphk.backend.endpoints.mocap.workspace.model.Attempt;
 import com.mocaphk.backend.endpoints.mocap.workspace.repository.AttemptRepository;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -18,7 +18,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AttemptService {
     private final AttemptRepository attemptRepository;
-    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public Attempt getAttemptById(Long id) {
         return attemptRepository.findById(id).orElse(null);
@@ -30,8 +29,7 @@ public class AttemptService {
 
     public Attempt getLatestAttemptByQuestionId(String userId, Long questionId) {
         return attemptRepository.findByUserIdAndQuestionId(userId, questionId).stream()
-                .max((a, b) -> LocalDateTime.parse(a.getUpdatedAt(), dateTimeFormatter)
-                        .compareTo(LocalDateTime.parse(b.getUpdatedAt(), dateTimeFormatter)))
+                .max(Comparator.comparing(a -> DateUtils.parse(a.getUpdatedAt())))
                 .orElse(null);
     }
 
@@ -40,8 +38,7 @@ public class AttemptService {
         attempt.setUserId(userId);
         attempt.setQuestionId(input.questionId());
         attempt.setCode(input.code());
-        attempt.setCreatedAt(dateTimeFormatter.format(LocalDateTime.now()));
-        attempt.setUpdatedAt(dateTimeFormatter.format(LocalDateTime.now()));
+        attempt.setCreatedAt(DateUtils.now());
         attempt.setIsSubmitted(false);
         attemptRepository.save(attempt);
         return attempt;
@@ -54,7 +51,6 @@ public class AttemptService {
         }
 
         attempt.setCode(input.code());
-        attempt.setUpdatedAt(dateTimeFormatter.format(LocalDateTime.now()));
         attemptRepository.save(attempt);
         return attempt;
     }

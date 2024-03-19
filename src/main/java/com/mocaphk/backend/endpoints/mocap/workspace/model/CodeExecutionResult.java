@@ -15,6 +15,7 @@ import java.util.List;
 @Setter
 public class CodeExecutionResult {
     @Embeddable
+    @NoArgsConstructor
     @AllArgsConstructor
     @Getter
     @Setter

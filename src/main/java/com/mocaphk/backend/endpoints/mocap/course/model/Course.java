@@ -30,9 +30,9 @@ public class Course {
     @ManyToMany(mappedBy = "courses")
     private List<User> users;
 
-    @OneToMany(mappedBy = "course")
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Assignment> assignments;
 
-    @OneToMany(mappedBy = "course")
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Announcement> announcements;
 }

@@ -39,6 +39,7 @@ public class BookService {
         Book book = new Book();
         book.setName(bookInput.name());
         book.setPageCount(bookInput.pageCount());
+        book.setType(bookInput.type());
         book.setAuthorId(author.getId());
         book.setSecret(123L);
         return bookRepo.save(book);

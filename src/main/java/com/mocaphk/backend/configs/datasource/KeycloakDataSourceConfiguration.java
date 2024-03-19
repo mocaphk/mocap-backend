@@ -61,7 +61,10 @@ public class KeycloakDataSourceConfiguration {
         properties.put("hibernate.dialect", env.getProperty("spring.jpa.properties.hibernate.dialect"));
         properties.put("hibernate.format_sql", env.getProperty("spring.jpa.properties.hibernate.format_sql"));
         properties.put("hibernate.hbm2ddl.auto", env.getProperty("spring.jpa.hibernate.ddl-auto"));
-        properties.put("hibernate.default_schema", env.getProperty("spring.datasource.keycloak.schema"));
+        properties.put("hibernate.default_schema", env.getProperty(
+                "spring.datasource.keycloak.schema",
+                env.getProperty("spring.jpa.properties.hibernate.default_schema")
+        ));
         properties.put("hibernate.physical_naming_strategy", "org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy");
         properties.put("hibernate.implicit_naming_strategy", "org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy");
         emf.setJpaPropertyMap(properties);

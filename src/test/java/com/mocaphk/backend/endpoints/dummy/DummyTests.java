@@ -3,6 +3,7 @@ package com.mocaphk.backend.endpoints.dummy;
 import com.mocaphk.backend.endpoints.mocap.dummy.controller.BookController;
 import com.mocaphk.backend.endpoints.mocap.dummy.dto.AuthorInput;
 import com.mocaphk.backend.endpoints.mocap.dummy.dto.BookInput;
+import com.mocaphk.backend.endpoints.mocap.dummy.enums.BookType;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +21,12 @@ public class DummyTests {
 
     @Test
     public void testGetBookById() {
-        assertThat(bookController.getBookById(1L).getName()).isEqualTo("Effective Java");
+        assertThat(bookController.getBookById(1L).getName()).isEqualTo("Test Book");
     }
 
     @Test
     public void testGetAllBooks() {
-        assertThat(bookController.getAllBooks().get(0).getName()).isEqualTo("Effective Java");
+        assertThat(bookController.getAllBooks().get(0).getName()).isEqualTo("Test Book");
     }
 
     @Test
@@ -34,6 +35,7 @@ public class DummyTests {
                 new BookInput(
                         "Test Book",
                         100,
+                        BookType.TEXTBOOK,
                         new AuthorInput("Test first name", "Test last name")
                 )
         ).getName()).isEqualTo("Test Book");

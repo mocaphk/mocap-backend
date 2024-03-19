@@ -1,5 +1,6 @@
 package com.mocaphk.backend.endpoints.workspace;
 
+import com.mocaphk.backend.endpoints.mocap.workspace.dto.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,10 +8,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.mocaphk.backend.endpoints.mocap.workspace.controller.TestcaseController;
-import com.mocaphk.backend.endpoints.mocap.workspace.dto.CreateCustomTestcaseInput;
-import com.mocaphk.backend.endpoints.mocap.workspace.dto.CreateTestcaseInput;
-import com.mocaphk.backend.endpoints.mocap.workspace.dto.UpdateCustomTestcaseInput;
-import com.mocaphk.backend.endpoints.mocap.workspace.dto.UpdateTestcaseInput;
 import com.mocaphk.backend.endpoints.mocap.workspace.model.CustomTestcase;
 import com.mocaphk.backend.endpoints.mocap.workspace.model.Testcase;
 import com.mocaphk.backend.endpoints.mocap.workspace.model.TestcaseInputEntry;
@@ -33,7 +30,7 @@ public class TestcaseTests {
                  1L,
                  List.of(
                          new CreateTestcaseInput(
-                                 List.of(new TestcaseInputEntry("foo", "bar")),
+                                 List.of(new TestcaseInputEntryInput("foo", "bar")),
                                  null,
                                  false
                          )
@@ -50,7 +47,7 @@ public class TestcaseTests {
                 1L,
                 List.of(
                         new CreateCustomTestcaseInput(
-                                List.of(new TestcaseInputEntry("foo", "bar"))
+                                List.of(new TestcaseInputEntryInput("foo", "bar"))
                         )
                 )
         );
@@ -86,7 +83,7 @@ public class TestcaseTests {
         Testcase testcase = testcaseController.updateTestcase(
                 1L,
                 new UpdateTestcaseInput(
-                        List.of(new TestcaseInputEntry("foo2", "bar2")),
+                        List.of(new TestcaseInputEntryInput("foo2", "bar2")),
                         null,
                         false
                 )
@@ -99,7 +96,7 @@ public class TestcaseTests {
         CustomTestcase testcase = testcaseController.updateCustomTestcase(
                 3L,
                 new UpdateCustomTestcaseInput(
-                        List.of(new TestcaseInputEntry("foo2", "bar2"))
+                        List.of(new TestcaseInputEntryInput("foo2", "bar2"))
                 )
         );
         assertThat(testcase.getId()).isEqualTo(3L);

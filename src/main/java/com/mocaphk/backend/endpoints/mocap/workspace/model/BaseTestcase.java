@@ -27,7 +27,8 @@ public abstract class BaseTestcase {
 
     /**
      * Check whether the result of the code execution with this testcase is correct,
-     * will set the result's isCorrect field to true if the result is correct.
+     * will set the result's isCorrect field to true if the result is correct, or otherwise.
+     * Will also set the result's testcaseId field to this testcase.
      *
      * @param result the result of the code execution with this testcase
      * @param sampleResult the result of the code execution with the sample code and this testcase
