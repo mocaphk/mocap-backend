@@ -59,7 +59,14 @@ public class CodingEnvironmentTests {
 
     @Test
     public void testDeleteCodingEnvironment() {
-        CodingEnvironment codingEnvironment = codingEnvironmentController.deleteCodingEnvironment(1L);
-        assertThat(codingEnvironment.getId()).isEqualTo(1L);
+        CodingEnvironment create = codingEnvironmentController.createCodingEnvironment(
+                new CreateCodingEnvironmentInput(
+                        "Test Coding Environment",
+                        "Python Test Coding Environment",
+                        "FROM python:3\n"
+                )
+        );
+        CodingEnvironment codingEnvironment = codingEnvironmentController.deleteCodingEnvironment(create.getId());
+        assertThat(codingEnvironment.getId()).isEqualTo(create.getId());
     }
 }

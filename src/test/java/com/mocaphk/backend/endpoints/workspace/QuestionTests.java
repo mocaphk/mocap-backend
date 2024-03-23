@@ -66,7 +66,20 @@ public class QuestionTests {
 
     @Test
     public void testDeleteQuestion() {
-        Question question = questionController.deleteQuestion(1L);
-        assertThat(question.getId()).isEqualTo(1L);
+        Question create = questionController.createQuestion(
+                new CreateQuestionInput(
+                        "Test Question",
+                        "Python Test Question",
+                        ProgrammingLanguage.PYTHON,
+                        "print('Hello World!')",
+                        CheckingMethod.CONSOLE,
+                        1L,
+                        "python {mainFile}",
+                        1000,
+                        1L
+                )
+        );
+        Question question = questionController.deleteQuestion(create.getId());
+        assertThat(question.getId()).isEqualTo(create.getId());
     }
 }

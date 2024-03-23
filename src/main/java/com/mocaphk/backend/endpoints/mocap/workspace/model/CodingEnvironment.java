@@ -9,7 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-//@Table(schema="test", name="coding_environment")
+@Table(name="coding_environment")
 public class CodingEnvironment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

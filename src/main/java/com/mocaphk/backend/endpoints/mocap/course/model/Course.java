@@ -24,6 +24,8 @@ public class Course {
 
     private String description;
 
+    private String year;
+
     private String createdAt;
 
     // TODO: schema map to instructors and students, and coding env

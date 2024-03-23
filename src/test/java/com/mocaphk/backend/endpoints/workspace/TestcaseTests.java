@@ -62,8 +62,8 @@ public class TestcaseTests {
 
     @Test
     public void testGetCustomTestcaseById() {
-        CustomTestcase testcase = testcaseController.getCustomTestcaseById(3L);
-        assertThat(testcase.getId()).isEqualTo(3L);
+        CustomTestcase testcase = testcaseController.getCustomTestcaseById(2L);
+        assertThat(testcase.getId()).isEqualTo(2L);
     }
 
     @Test
@@ -94,23 +94,46 @@ public class TestcaseTests {
     @Test
     public void testUpdateCustomTestcase() {
         CustomTestcase testcase = testcaseController.updateCustomTestcase(
-                3L,
+                2L,
                 new UpdateCustomTestcaseInput(
                         List.of(new TestcaseInputEntryInput("foo2", "bar2"))
                 )
         );
-        assertThat(testcase.getId()).isEqualTo(3L);
+        assertThat(testcase.getId()).isEqualTo(2L);
     }
 
     @Test
     public void testDeleteTestcase() {
-        Testcase testcase = testcaseController.deleteTestcase(5L);
-        assertThat(testcase.getId()).isEqualTo(5L);
+        List<Testcase> testcases = testcaseController.createTestcases(
+                1L,
+                List.of(
+                        new CreateTestcaseInput(
+                                List.of(new TestcaseInputEntryInput("foo", "bar")),
+                                null,
+                                false
+                        )
+                )
+        );
+        for (Testcase testcase : testcases) {
+            Testcase deleted = testcaseController.deleteTestcase(testcase.getId());
+            assertThat(deleted.getId()).isEqualTo(testcase.getId());
+        }
     }
 
     @Test
     public void testDeleteCustomTestcase() {
-        CustomTestcase testcase = testcaseController.deleteCustomTestcase(3L);
-        assertThat(testcase.getId()).isEqualTo(3L);
+        List<CustomTestcase> testcases = testcaseController.createCustomTestcases(
+                TEST_STUDENT_USER_ID,
+                1L,
+                List.of(
+                        new CreateCustomTestcaseInput(
+                                List.of(new TestcaseInputEntryInput("foo", "bar"))
+                        )
+                )
+        );
+        for (CustomTestcase testcase : testcases) {
+            CustomTestcase deleted = testcaseController.deleteCustomTestcase(testcase.getId());
+            assertThat(deleted.getId()).isEqualTo(testcase.getId());
+        }
     }
 }
