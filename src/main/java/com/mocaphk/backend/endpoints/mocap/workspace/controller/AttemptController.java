@@ -20,9 +20,9 @@ public class AttemptController {
     private final AttemptService attemptService;
 
     @QueryMapping(name = "attempt")
-    public Attempt getAttemptById(@Argument Long id) {
-        log.debug("getAttemptById: {}", id);
-        return attemptService.getAttemptById(id);
+    public Attempt getAttemptById(@Argument Long attemptId) {
+        log.debug("getAttemptById: {}", attemptId);
+        return attemptService.getAttemptById(attemptId);
     }
 
     @MutationMapping(name = "createAttempt")
@@ -39,8 +39,8 @@ public class AttemptController {
     }
 
     @MutationMapping(name = "updateAttempt")
-    public Attempt updateAttempt(@Argument Long id, @Argument UpdateAttemptInput attemptInput) {
-        log.debug("updateAttempt: {}, {}", id, attemptInput);
-        return attemptService.updateAttempt(id, attemptInput);
+    public Attempt updateAttempt(@Argument Long attemptId, @Argument UpdateAttemptInput attemptInput) {
+        log.debug("updateAttempt: {}, {}", attemptId, attemptInput);
+        return attemptService.updateAttempt(attemptId, attemptInput);
     }
 }
