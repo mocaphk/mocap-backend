@@ -24,4 +24,3 @@ public class UserService {
         return userRepo.findAll();
     }
 }
-

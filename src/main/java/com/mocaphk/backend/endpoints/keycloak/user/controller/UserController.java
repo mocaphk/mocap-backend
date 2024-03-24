@@ -2,7 +2,6 @@ package com.mocaphk.backend.endpoints.keycloak.user.controller;
 
 import com.mocaphk.backend.endpoints.keycloak.user.model.User;
 import com.mocaphk.backend.endpoints.keycloak.user.service.UserService;
-import com.mocaphk.backend.endpoints.mocap.dummy.model.Book;
 import com.mocaphk.backend.enums.Roles;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;

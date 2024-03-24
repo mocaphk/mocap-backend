@@ -15,9 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
+import java.io.*;
 import java.time.Duration;
 
 /**
@@ -30,13 +28,17 @@ public class DockerManager {
     @RequiredArgsConstructor
     public class AutoCleanupCallback extends ResultCallback.Adapter<Frame> {
         private final String containerId;
+        private boolean isClosed = false;
 
         @Override
-        public void onComplete() {
-            if (!stopContainer(containerId) || !removeContainer(containerId)) {
-                log.warn("Failed to stop and remove container " + containerId);
+        public void close() throws IOException {
+            if (!isClosed) {
+                isClosed = true;
+                if (!stopContainer(containerId) || !removeContainer(containerId, true)) {
+                    log.warn("Failed to stop and remove container " + containerId);
+                }
             }
-            super.onComplete();
+            super.close();
         }
     }
 
@@ -78,6 +80,7 @@ public class DockerManager {
      * @return imageId
      */
     public String buildImageWithPersistentContainer(String dockerFileContent) {
+        // TODO: if the dockerfile does not have bash, it will not work. Try withBuildArg
         return buildImage(dockerFileContent + "\nCMD exec /bin/bash -c \"trap : TERM INT; sleep infinity & wait\"\n");
     }
 
@@ -107,6 +110,20 @@ public class DockerManager {
         return null;
     }
 
+    public boolean removeImage(String imageId) {
+        if (StringUtils.isBlank(imageId)) {
+            return false;
+        }
+
+        try {
+            docker.removeImageCmd(imageId).exec();
+            return true;
+        } catch (Exception e) {
+            log.error("Exception: " + e.getMessage());
+        }
+        return false;
+    }
+
     /**
      * Create a Docker container.
      *
@@ -132,16 +149,16 @@ public class DockerManager {
      * @param containerId The id of the container to remove
      * @return true if success, false otherwise
      */
-    public boolean removeContainer(String containerId) {
+    public boolean removeContainer(String containerId, boolean force) {
         if (StringUtils.isBlank(containerId)) {
             return false;
         }
 
         try {
-            docker.removeContainerCmd(containerId).exec();
+            docker.removeContainerCmd(containerId).withForce(force).exec();
             return true;
         } catch (Exception e) {
-            log.error("Exception: " + e.getMessage());
+            log.error("Exception when removing container: ", e);
         }
         return false;
     }
@@ -181,7 +198,8 @@ public class DockerManager {
             docker.stopContainerCmd(containerId).exec();
             return true;
         } catch (Exception e) {
-            log.error("Exception: " + e.getMessage());
+            log.error("Exception when stopping container: " + e.getMessage());
+            e.printStackTrace();
         }
         return false;
     }
@@ -222,27 +240,34 @@ public class DockerManager {
      * Execute a command in a Docker container.
      *
      * @param containerId The id of the container to execute command in
+     * @param stdin The input stream to the command
      * @param callback The callback to handle the status and output of the command
      * @param command The command to execute
      * @return true if success, false otherwise
      */
-    public boolean execCommand(String containerId, ResultCallback.Adapter<Frame> callback, String... command) {
+    public ResultCallback.Adapter<Frame> execCommand(String containerId, InputStream stdin, ResultCallback.Adapter<Frame> callback, String... command) {
         if (StringUtils.isBlank(containerId) || callback == null || command == null || command.length == 0) {
-            return false;
+            return null;
         }
 
         try {
-            var execCreateCmdResponse = docker.execCreateCmd(containerId)
-                    .withCmd(command)
-                    .withAttachStdout(true)
-                    .withAttachStderr(true)
-                    .exec();
-            docker.execStartCmd(execCreateCmdResponse.getId()).exec(callback);
-            return true;
+            var execCreateCmd = docker.execCreateCmd(containerId)
+                   .withCmd(command)
+                   .withAttachStdout(true)
+                   .withAttachStderr(true);
+            if (stdin != null) {
+                execCreateCmd = execCreateCmd.withAttachStdin(true);
+            }
+
+            var execStartCmd = docker.execStartCmd(execCreateCmd.exec().getId());
+            if (stdin != null) {
+                execStartCmd.withStdIn(stdin);
+            }
+            return execStartCmd.exec(callback);
         } catch (Exception e) {
             log.error("Exception: " + e.getMessage());
         }
-        return false;
+        return null;
     }
 
     // https://stackoverflow.com/questions/7083698/create-a-file-object-in-memory-from-a-string-in-java

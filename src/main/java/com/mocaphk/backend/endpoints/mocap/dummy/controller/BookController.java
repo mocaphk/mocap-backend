@@ -42,9 +42,9 @@ public class BookController {
         return bookService.addBook(bookInput);
     }
 
-    @SchemaMapping(typeName = "Book", field = "author")
-    public Author getAuthorByBook(Book book) {
-        log.debug("getAuthorByBook: {}", book);
-        return bookService.getAuthorById(book.getAuthorId());
-    }
+//    @SchemaMapping(typeName = "Book", field = "author")
+//    public Author getAuthorByBook(Book book) {
+//        log.debug("getAuthorByBook: {}", book);
+//        return bookService.getAuthorById(book.getAuthorId());
+//    }
 }
