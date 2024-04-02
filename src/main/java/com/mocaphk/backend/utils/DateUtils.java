@@ -11,6 +11,10 @@ public class DateUtils {
         return dateTimeFormatter.format(LocalDateTime.now());
     }
 
+    public static String currentYear() {
+        return Integer.toString(LocalDateTime.now().getYear());
+    }
+
     public static LocalDateTime parse(String date) {
         return LocalDateTime.parse(date, dateTimeFormatter);
     }

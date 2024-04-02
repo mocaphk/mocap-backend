@@ -1,5 +1,6 @@
 package com.mocaphk.backend.endpoints.mocap.course.model;
 
+import com.mocaphk.backend.endpoints.keycloak.user.model.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,9 +29,24 @@ public class Course {
 
     private String createdAt;
 
-    // TODO: schema map to instructors and students, and coding env
-    @ManyToMany(mappedBy = "courses")
-    private List<MocapUser> users;
+    private String updatedAt;
+
+    private String barColor;
+
+    @Transient
+    private List<MocapUser> admins;
+
+    @Transient
+    private List<MocapUser> lecturers;
+
+    @Transient
+    private List<MocapUser> tutors;
+
+    @Transient
+    private List<MocapUser> students;
+
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ExternalLink> externalLinks;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Assignment> assignments;
