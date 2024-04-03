@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
@@ -17,6 +18,15 @@ import org.springframework.stereotype.Controller;
 @RequiredArgsConstructor
 public class AssignmentController {
     private final AssignmentService assignmentService;
+
+    @QueryMapping(name = "assignment")
+    public Assignment getAssignment(Authentication authentication, @Argument Long id) {
+        log.debug("getAssignment: {}", id);
+        if (!authentication.isAuthenticated()) {
+            return null;
+        }
+        return assignmentService.getAssignmentById(id, authentication.getName());
+    }
 
     @MutationMapping(name = "createAssignment")
     public Assignment createAssignment(Authentication authentication, @Argument CreateAssignmentInput assignmentInput) {
