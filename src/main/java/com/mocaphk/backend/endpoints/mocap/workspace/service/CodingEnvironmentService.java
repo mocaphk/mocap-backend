@@ -6,6 +6,7 @@ import com.mocaphk.backend.endpoints.mocap.workspace.dto.UpdateCodingEnvironment
 import com.mocaphk.backend.endpoints.mocap.workspace.model.CodingEnvironment;
 import com.mocaphk.backend.endpoints.mocap.workspace.repository.CodingEnvironmentRepository;
 
+import com.mocaphk.backend.utils.DateUtils;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,8 @@ public class CodingEnvironmentService {
         codingEnvironment.setDockerfile(input.dockerfile());
         codingEnvironment.setIsBuilt(false);
         codingEnvironment.setDockerImageId(null);
+        codingEnvironment.setCreatedAt(DateUtils.now());
+        codingEnvironment.setCourseId(input.courseId());
         codingEnvironmentRepository.save(codingEnvironment);
         return codingEnvironment;
     }

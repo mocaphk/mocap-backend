@@ -1,6 +1,7 @@
 package com.mocaphk.backend.endpoints.mocap.course.model;
 
 import com.mocaphk.backend.endpoints.keycloak.user.model.User;
+import com.mocaphk.backend.endpoints.mocap.workspace.model.CodingEnvironment;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -53,4 +54,7 @@ public class Course {
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Announcement> announcements;
+
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CodingEnvironment> codingEnvironments;
 }
