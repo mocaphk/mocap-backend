@@ -44,7 +44,8 @@ public class CodeExecutionTests {
                 new CreateCodingEnvironmentInput(
                         "Test Coding Environment",
                         "Python Test Coding Environment",
-                        "FROM python:3\n"
+                        "FROM python:3\n",
+                        1L
                 )
         );
         assertThat(codingEnvironment.getId()).isNotNull();

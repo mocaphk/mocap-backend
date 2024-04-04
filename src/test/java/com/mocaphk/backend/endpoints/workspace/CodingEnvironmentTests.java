@@ -26,7 +26,8 @@ public class CodingEnvironmentTests {
                 new CreateCodingEnvironmentInput(
                         "Test Coding Environment",
                         "Python Test Coding Environment",
-                        "FROM python:3\n"
+                        "FROM python:3\n",
+                        1L
                 )
         );
         assertThat(codingEnvironment.getId()).isNotNull();
@@ -63,7 +64,8 @@ public class CodingEnvironmentTests {
                 new CreateCodingEnvironmentInput(
                         "Test Coding Environment",
                         "Python Test Coding Environment",
-                        "FROM python:3\n"
+                        "FROM python:3\n",
+                        1L
                 )
         );
         CodingEnvironment codingEnvironment = codingEnvironmentController.deleteCodingEnvironment(create.getId());
