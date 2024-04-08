@@ -34,18 +34,6 @@ public class Course {
 
     private String barColor;
 
-    @Transient
-    private List<MocapUser> admins;
-
-    @Transient
-    private List<MocapUser> lecturers;
-
-    @Transient
-    private List<MocapUser> tutors;
-
-    @Transient
-    private List<MocapUser> students;
-
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ExternalLink> externalLinks;
 

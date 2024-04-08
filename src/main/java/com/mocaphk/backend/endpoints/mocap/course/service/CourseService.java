@@ -35,22 +35,7 @@ public class CourseService {
             return null;
         }
 
-        Course course = courseRepository.findById(id).orElse(null);
-
-        if (course == null) {
-            return null;
-        }
-
-        List<MocapUser> admins = courseUserRepository.findByCourseIdAndRole(course.getId(), CourseRole.ADMIN).stream().map(CourseUser::getUser).toList();
-        List<MocapUser> lecturers = courseUserRepository.findByCourseIdAndRole(course.getId(), CourseRole.LECTURER).stream().map(CourseUser::getUser).toList();
-        List<MocapUser> tutors = courseUserRepository.findByCourseIdAndRole(course.getId(), CourseRole.TUTOR).stream().map(CourseUser::getUser).toList();
-        List<MocapUser> students = courseUserRepository.findByCourseIdAndRole(course.getId(), CourseRole.STUDENT).stream().map(CourseUser::getUser).toList();
-        course.setAdmins(admins);
-        course.setLecturers(lecturers);
-        course.setTutors(tutors);
-        course.setStudents(students);
-
-        return course;
+        return courseRepository.findById(id).orElse(null);
     }
 
     public Course createCourse(CreateCourseInput input, String userId) {
