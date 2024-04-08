@@ -35,17 +35,10 @@ public class CourseUserService {
 
     public List<Course> getCoursesByUserId(String userId) {
         List<CourseUser> courseUsers = courseUserRepository.findByUserId(userId);
-        List<Course> courses = courseUsers.stream().map(CourseUser::getCourse).toList();
-        courses.forEach(course -> {
-            List<MocapUser> admins = courseUserRepository.findByCourseIdAndRole(course.getId(), CourseRole.ADMIN).stream().map(CourseUser::getUser).toList();
-            List<MocapUser> lecturers = courseUserRepository.findByCourseIdAndRole(course.getId(), CourseRole.LECTURER).stream().map(CourseUser::getUser).toList();
-            List<MocapUser> tutors = courseUserRepository.findByCourseIdAndRole(course.getId(), CourseRole.TUTOR).stream().map(CourseUser::getUser).toList();
-            List<MocapUser> students = courseUserRepository.findByCourseIdAndRole(course.getId(), CourseRole.STUDENT).stream().map(CourseUser::getUser).toList();
-            course.setAdmins(admins);
-            course.setLecturers(lecturers);
-            course.setTutors(tutors);
-            course.setStudents(students);
-        });
-        return courses;
+        return courseUsers.stream().map(CourseUser::getCourse).toList();
+    }
+
+    public List<MocapUser> getUsersByCourseIdAndRole(Long courseId, CourseRole role) {
+        return courseUserRepository.findByCourseIdAndRole(courseId, role).stream().map(CourseUser::getUser).toList();
     }
 }
