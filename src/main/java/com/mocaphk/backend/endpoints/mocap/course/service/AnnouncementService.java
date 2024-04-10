@@ -6,6 +6,8 @@ import com.mocaphk.backend.endpoints.mocap.course.dto.UpdateAnnouncementInput;
 import com.mocaphk.backend.endpoints.mocap.course.model.Announcement;
 import com.mocaphk.backend.endpoints.mocap.course.model.Course;
 import com.mocaphk.backend.endpoints.mocap.course.repository.AnnouncementRepository;
+import com.mocaphk.backend.endpoints.mocap.course.repository.CourseRepository;
+import com.mocaphk.backend.endpoints.mocap.course.repository.CourseUserRepository;
 import com.mocaphk.backend.endpoints.mocap.user.model.MocapUser;
 import com.mocaphk.backend.endpoints.mocap.user.repository.MocapUserRepository;
 import com.mocaphk.backend.endpoints.mocap.user.service.MocapUserService;
@@ -25,6 +27,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AnnouncementService {
     private final AnnouncementRepository announcementRepository;
+    private final CourseRepository courseRepository;
     private final MocapUserRepository mocapUserRepository;
     private final CourseUserService courseUserService;
     private final MocapUserService mocapUserService;
@@ -102,10 +105,15 @@ public class AnnouncementService {
         if (creator == null) {
             return;
         }
+        
+        Course course = courseRepository.findById(announcement.getCourseId()).orElse(null);
+        if (course == null) {
+            return;
+        }
 
         String creatorName = creator.getUsername();
         String subject = String.format("[MOCAP] %s: New Announcement form %s: %s",
-                announcement.getCourse().getCode(),
+                course.getCode(),
                 creatorName,
                 announcement.getTitle()
         );
@@ -114,7 +122,7 @@ public class AnnouncementService {
                 announcement.getContent()
         );
 
-        for (MocapUser user : mocapUserService.getMocapUsersByCourseId(announcement.getCourse().getId())) {
+        for (MocapUser user : mocapUserService.getMocapUsersByCourseId(course.getId())) {
             try {
                 mocapMailSender.sendMail(
                         String.format("%s [via MOCAP]", creatorName),
