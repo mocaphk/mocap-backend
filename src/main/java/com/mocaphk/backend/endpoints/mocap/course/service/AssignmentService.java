@@ -5,6 +5,7 @@ import com.mocaphk.backend.endpoints.mocap.course.dto.CreateCourseInput;
 import com.mocaphk.backend.endpoints.mocap.course.model.*;
 import com.mocaphk.backend.endpoints.mocap.course.repository.AssignmentRepository;
 import com.mocaphk.backend.endpoints.mocap.course.repository.CourseRepository;
+import com.mocaphk.backend.endpoints.mocap.course.repository.CourseUserRepository;
 import com.mocaphk.backend.endpoints.mocap.user.model.MocapUser;
 import com.mocaphk.backend.endpoints.mocap.user.repository.MocapUserRepository;
 import com.mocaphk.backend.endpoints.mocap.workspace.model.Question;
@@ -23,7 +24,29 @@ public class AssignmentService {
     private final AssignmentRepository assignmentRepository;
     private final CourseRepository courseRepository;
     private final MocapUserRepository mocapUserRepository;
+    private final CourseUserRepository courseUserRepository;
 
+    public Assignment getAssignmentById(Long id, String userId) {
+        Assignment assignment = assignmentRepository.findById(id).orElse(null);
+        if (assignment == null) {
+            return null;
+        }
+
+        // Check if user is in the course or not
+        Course course = assignment.getCourse();
+        if (course == null) {
+            return null;
+        }
+
+        CourseUserId courseUserId = new CourseUserId(course.getId(), userId);
+        CourseUser courseUser = courseUserRepository.findById(courseUserId).orElse(null);
+
+        if (courseUser == null) {
+            return null;
+        }
+
+        return assignment;
+    }
 
     public Assignment createAssignment(CreateAssignmentInput input, String userId) {
         MocapUser user = mocapUserRepository.findById(userId).orElse(null);
