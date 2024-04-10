@@ -18,4 +18,14 @@ public class DateUtils {
     public static LocalDateTime parse(String date) {
         return LocalDateTime.parse(date, dateTimeFormatter);
     }
+
+    public static String toCron(LocalDateTime time) {
+        return String.format("%d %d %d %d %d ?",
+                time.getSecond(),
+                time.getMinute(),
+                time.getHour(),
+                time.getDayOfMonth(),
+                time.getMonthValue()
+        );
+    }
 }

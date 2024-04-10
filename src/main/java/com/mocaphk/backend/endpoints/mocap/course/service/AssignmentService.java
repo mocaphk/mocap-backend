@@ -1,15 +1,15 @@
 package com.mocaphk.backend.endpoints.mocap.course.service;
 
+import com.mocaphk.backend.components.MocapMailSender;
 import com.mocaphk.backend.endpoints.mocap.course.dto.CreateAssignmentInput;
-import com.mocaphk.backend.endpoints.mocap.course.dto.CreateCourseInput;
 import com.mocaphk.backend.endpoints.mocap.course.model.*;
 import com.mocaphk.backend.endpoints.mocap.course.repository.AssignmentRepository;
 import com.mocaphk.backend.endpoints.mocap.course.repository.CourseRepository;
 import com.mocaphk.backend.endpoints.mocap.course.repository.CourseUserRepository;
 import com.mocaphk.backend.endpoints.mocap.user.model.MocapUser;
 import com.mocaphk.backend.endpoints.mocap.user.repository.MocapUserRepository;
+import com.mocaphk.backend.endpoints.mocap.user.service.MocapUserService;
 import com.mocaphk.backend.endpoints.mocap.workspace.model.Question;
-import com.mocaphk.backend.enums.CourseRole;
 import com.mocaphk.backend.utils.DateUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +25,8 @@ public class AssignmentService {
     private final CourseRepository courseRepository;
     private final MocapUserRepository mocapUserRepository;
     private final CourseUserRepository courseUserRepository;
+    private final MocapUserService mocapUserService;
+    private final MocapMailSender mocapMailSender;
 
     public Assignment getAssignmentById(Long id, String userId) {
         Assignment assignment = assignmentRepository.findById(id).orElse(null);
@@ -75,8 +77,31 @@ public class AssignmentService {
         assignment.setCreatedAt(now);
         assignment.setUpdatedAt(now);
 
+        scheduleAssignmentMail(assignment);
         assignmentRepository.save(assignment);
 
         return assignment;
+    }
+
+    private void scheduleAssignmentMail(Assignment assignment) {
+        String subject = String.format("[MOCAP] %s: New Assignment: %s",
+                assignment.getCourse().getCode(),
+                assignment.getTitle()
+        );
+        String body = String.format("New assignment:\n%s\n\nDescription:\n%s\n\nDue date: %s",
+                assignment.getTitle(),
+                assignment.getDescription(),
+                assignment.getDateDue()
+        );
+
+        for (MocapUser user : mocapUserService.getMocapUsersByCourseId(assignment.getCourse().getId())) {
+            mocapMailSender.scheduleMail(
+                    "MOCAP",
+                    user.getEmail(),
+                    subject,
+                    body,
+                    DateUtils.parse(assignment.getDateOpen())
+            );
+        }
     }
 }
