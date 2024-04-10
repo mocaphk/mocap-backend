@@ -32,7 +32,7 @@ public class CodingEnvironmentController {
     }
 
     @MutationMapping(name = "updateCodingEnvironment")
-    public CodingEnvironment updateCodingEnvironment(@Argument Long id, UpdateCodingEnvironmentInput codingEnvironmentInput) {
+    public CodingEnvironment updateCodingEnvironment(@Argument Long id, @Argument UpdateCodingEnvironmentInput codingEnvironmentInput) {
         log.debug("updateCodingEnvironment: {}, {}", id, codingEnvironmentInput);
         return codingEnvironmentService.updateCodingEnvironment(id, codingEnvironmentInput);
     }

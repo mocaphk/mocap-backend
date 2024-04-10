@@ -51,7 +51,7 @@ public class TestcaseController {
         return getCustomTestcasesByQuestionId(authentication.getName(), questionId);
     }
 
-    public List<CustomTestcase> getCustomTestcasesByQuestionId(String userId, @Argument Long questionId) {
+    public List<CustomTestcase> getCustomTestcasesByQuestionId(String userId, Long questionId) {
         return testcaseService.getCustomTestcasesByQuestionId(userId, questionId);
     }
 

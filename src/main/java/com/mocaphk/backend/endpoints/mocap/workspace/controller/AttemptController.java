@@ -34,7 +34,7 @@ public class AttemptController {
         return createAttempt(authentication.getName(), attemptInput);
     }
 
-    public Attempt createAttempt(String userId, @Argument CreateAttemptInput attemptInput) {
+    public Attempt createAttempt(String userId, CreateAttemptInput attemptInput) {
         return attemptService.createAttempt(userId, attemptInput);
     }
 
