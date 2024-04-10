@@ -98,10 +98,15 @@ public class AnnouncementService {
     }
 
     private void sendAnnouncementMail(Announcement announcement) {
-        String creator = announcement.getCreatedBy().getUsername();
+        MocapUser creator = mocapUserRepository.findById(announcement.getCreatedById()).orElse(null);
+        if (creator == null) {
+            return;
+        }
+
+        String creatorName = creator.getUsername();
         String subject = String.format("[MOCAP] %s: New Announcement form %s: %s",
                 announcement.getCourse().getCode(),
-                creator,
+                creatorName,
                 announcement.getTitle()
         );
         String body = String.format("New announcement: %s\n\nContent: %s",
@@ -112,7 +117,7 @@ public class AnnouncementService {
         for (MocapUser user : mocapUserService.getMocapUsersByCourseId(announcement.getCourse().getId())) {
             try {
                 mocapMailSender.sendMail(
-                        String.format("%s [via MOCAP]", creator),
+                        String.format("%s [via MOCAP]", creatorName),
                         user.getEmail(),
                         subject,
                         body
