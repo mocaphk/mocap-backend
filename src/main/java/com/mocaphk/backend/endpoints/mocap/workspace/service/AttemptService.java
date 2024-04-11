@@ -32,6 +32,10 @@ public class AttemptService {
     }
 
 
+    public Attempt getLatestSubmissionByQuestionId(String userId, Long questionId) {
+        return attemptRepository.findFirstByUserIdAndQuestionIdAndIsSubmittedTrueOrderByUpdatedAtDesc(userId, questionId);
+    }
+
     public Attempt createAttempt(String userId, CreateAttemptInput input) {
         Attempt attempt = new Attempt();
         attempt.setUserId(userId);
