@@ -89,7 +89,9 @@ public class CodeExecutionTests {
 
         CodeExecutionResult codeExecutionResult1 = result1.getResults().get(0);
         assertThat(codeExecutionResult1.getAttemptResultId()).isEqualTo(result1.getId());
+        assertThat(codeExecutionResult1.getInput()).isNull();
         assertThat(codeExecutionResult1.getOutput().size()).isEqualTo(1);
+        assertThat(codeExecutionResult1.getSampleOutput().size()).isEqualTo(1);
         assertThat(codeExecutionResult1.getIsExecutionSuccess()).isTrue();
         assertThat(codeExecutionResult1.getIsCorrect()).isTrue();
         assertThat(codeExecutionResult1.getIsExceedTimeLimit()).isFalse();
@@ -97,6 +99,10 @@ public class CodeExecutionTests {
         CodeExecutionResult.CodeExecutionOutput output1 = codeExecutionResult1.getOutput().get(0);
         assertThat(output1.getStreamType()).isEqualTo(CodeStream.STDOUT);
         assertThat(output1.getPayload()).isEqualTo("Hello World!\n");
+
+        CodeExecutionResult.CodeExecutionOutput sampleOutput1 = codeExecutionResult1.getSampleOutput().get(0);
+        assertThat(sampleOutput1.getStreamType()).isEqualTo(CodeStream.STDOUT);
+        assertThat(sampleOutput1.getPayload()).isEqualTo("Hello World!\n");
 
         attemptService.updateAttempt(
                 attempt.getId(),
@@ -110,7 +116,9 @@ public class CodeExecutionTests {
 
         CodeExecutionResult codeExecutionResult2 = result2.getResults().get(0);
         assertThat(codeExecutionResult2.getAttemptResultId()).isEqualTo(result2.getId());
+        assertThat(codeExecutionResult2.getInput()).isNull();
         assertThat(codeExecutionResult2.getOutput().size()).isEqualTo(1);
+        assertThat(codeExecutionResult2.getSampleOutput().size()).isEqualTo(1);
         assertThat(codeExecutionResult2.getIsExecutionSuccess()).isTrue();
         assertThat(codeExecutionResult2.getIsCorrect()).isFalse();
         assertThat(codeExecutionResult2.getIsExceedTimeLimit()).isFalse();
@@ -118,6 +126,10 @@ public class CodeExecutionTests {
         CodeExecutionResult.CodeExecutionOutput output2 = codeExecutionResult2.getOutput().get(0);
         assertThat(output2.getStreamType()).isEqualTo(CodeStream.STDOUT);
         assertThat(output2.getPayload()).isEqualTo("Bye World!\n");
+
+        CodeExecutionResult.CodeExecutionOutput sampleOutput2 = codeExecutionResult2.getSampleOutput().get(0);
+        assertThat(sampleOutput2.getStreamType()).isEqualTo(CodeStream.STDOUT);
+        assertThat(sampleOutput2.getPayload()).isEqualTo("Hello World!\n");
     }
 
     @Test
@@ -167,8 +179,13 @@ public class CodeExecutionTests {
         List<String> outputs = new ArrayList<>();
         for (CodeExecutionResult codeExecutionResult : result1.getResults()) {
             assertThat(codeExecutionResult.getAttemptResultId()).isEqualTo(result1.getId());
+            assertThat(codeExecutionResult.getInput().size()).isEqualTo(1);
             // async execution with stdin, so the number of output fragments created is not guaranteed
             assertThat(codeExecutionResult.getOutput().size()).satisfiesAnyOf(
+                    res -> assertThat(res).isEqualTo(1),
+                    res -> assertThat(res).isEqualTo(2)
+            );
+            assertThat(codeExecutionResult.getSampleOutput().size()).satisfiesAnyOf(
                     res -> assertThat(res).isEqualTo(1),
                     res -> assertThat(res).isEqualTo(2)
             );
@@ -200,7 +217,12 @@ public class CodeExecutionTests {
 
         for (CodeExecutionResult codeExecutionResult : result2.getResults()) {
             assertThat(codeExecutionResult.getAttemptResultId()).isEqualTo(result2.getId());
+            assertThat(codeExecutionResult.getInput().size()).isEqualTo(1);
             assertThat(codeExecutionResult.getOutput().size()).isEqualTo(1);
+            assertThat(codeExecutionResult.getSampleOutput().size()).satisfiesAnyOf(
+                    res -> assertThat(res).isEqualTo(1),
+                    res -> assertThat(res).isEqualTo(2)
+            );
             assertThat(codeExecutionResult.getIsExecutionSuccess()).isTrue();
             assertThat(codeExecutionResult.getIsCorrect()).isFalse();
             assertThat(codeExecutionResult.getIsExceedTimeLimit()).isFalse();
@@ -241,8 +263,13 @@ public class CodeExecutionTests {
 
         CodeExecutionResult result1 = codeExecutionService.runTestcase(attempt.getId(), testcases.get(0).getId());
 
+        assertThat(result1.getInput().size()).isEqualTo(1);
         // async execution with stdin, so the number of output fragments created is not guaranteed
         assertThat(result1.getOutput().size()).satisfiesAnyOf(
+                res -> assertThat(res).isEqualTo(1),
+                res -> assertThat(res).isEqualTo(2)
+        );
+        assertThat(result1.getSampleOutput().size()).satisfiesAnyOf(
                 res -> assertThat(res).isEqualTo(1),
                 res -> assertThat(res).isEqualTo(2)
         );
@@ -264,7 +291,12 @@ public class CodeExecutionTests {
 
         CodeExecutionResult result2 = codeExecutionService.runTestcase(attempt.getId(), testcases.get(0).getId());
 
+        assertThat(result2.getInput().size()).isEqualTo(1);
         assertThat(result2.getOutput().size()).isEqualTo(1);
+        assertThat(result2.getSampleOutput().size()).satisfiesAnyOf(
+                res -> assertThat(res).isEqualTo(1),
+                res -> assertThat(res).isEqualTo(2)
+        );
         assertThat(result2.getIsExecutionSuccess()).isTrue();
         assertThat(result2.getIsCorrect()).isFalse();
         assertThat(result2.getIsExceedTimeLimit()).isFalse();
@@ -322,8 +354,13 @@ public class CodeExecutionTests {
         List<String> outputs = new ArrayList<>();
         for (CodeExecutionResult codeExecutionResult : result1.getResults()) {
             assertThat(codeExecutionResult.getAttemptResultId()).isEqualTo(result1.getId());
+            assertThat(codeExecutionResult.getInput().size()).isEqualTo(1);
             // async execution with stdin, so the number of output fragments created is not guaranteed
             assertThat(codeExecutionResult.getOutput().size()).satisfiesAnyOf(
+                    res -> assertThat(res).isEqualTo(1),
+                    res -> assertThat(res).isEqualTo(2)
+            );
+            assertThat(codeExecutionResult.getSampleOutput().size()).satisfiesAnyOf(
                     res -> assertThat(res).isEqualTo(1),
                     res -> assertThat(res).isEqualTo(2)
             );
@@ -356,7 +393,12 @@ public class CodeExecutionTests {
 
         for (CodeExecutionResult codeExecutionResult : result2.getResults()) {
             assertThat(codeExecutionResult.getAttemptResultId()).isEqualTo(result2.getId());
+            assertThat(codeExecutionResult.getInput().size()).isEqualTo(1);
             assertThat(codeExecutionResult.getOutput().size()).isEqualTo(1);
+            assertThat(codeExecutionResult.getSampleOutput().size()).satisfiesAnyOf(
+                    res -> assertThat(res).isEqualTo(1),
+                    res -> assertThat(res).isEqualTo(2)
+            );
             assertThat(codeExecutionResult.getIsExecutionSuccess()).isTrue();
             assertThat(codeExecutionResult.getIsCorrect()).isFalse();
             assertThat(codeExecutionResult.getIsExceedTimeLimit()).isFalse();

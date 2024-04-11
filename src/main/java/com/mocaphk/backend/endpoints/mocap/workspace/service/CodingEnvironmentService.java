@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -24,6 +25,10 @@ public class CodingEnvironmentService {
 
     public CodingEnvironment getCodingEnvironmentById(Long id) {
         return codingEnvironmentRepository.findById(id).orElse(null);
+    }
+
+    public List<CodingEnvironment> getCodingEnvironmentByAssignmentId(Long id) {
+        return codingEnvironmentRepository.findByCourse_Assignments_IdOrCourseIdNull(id);
     }
 
     public CodingEnvironment createCodingEnvironment(CreateCodingEnvironmentInput input) {

@@ -5,6 +5,10 @@ import org.springframework.stereotype.Repository;
 
 import com.mocaphk.backend.endpoints.mocap.workspace.model.CodingEnvironment;
 
+import java.util.List;
+
 @Repository
 public interface CodingEnvironmentRepository extends JpaRepository<CodingEnvironment, Long> {
+
+    List<CodingEnvironment> findByCourse_Assignments_IdOrCourseIdNull(Long id);
 }

@@ -1,5 +1,6 @@
 package com.mocaphk.backend.endpoints.mocap.workspace.controller;
 
+import com.mocaphk.backend.endpoints.mocap.workspace.repository.CodeExecutionResultRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -23,6 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TestcaseController {
     private final TestcaseService testcaseService;
+    private final CodeExecutionResultRepository codeExecutionResultRepository;
 
     @QueryMapping(name = "testcase")
     public Testcase getTestcaseById(@Argument Long id) {
@@ -56,45 +58,45 @@ public class TestcaseController {
     }
 
     @MutationMapping(name = "createTestcases")
-    public List<Testcase> createTestcases(@Argument Long questionId, @Argument List<CreateTestcaseInput> inputs) {
-        log.debug("createTestcases: {}, {}", questionId, inputs);
-        return testcaseService.createTestcases(questionId, inputs);
+    public List<Testcase> createTestcases(@Argument Long questionId, @Argument List<CreateTestcaseInput> testcaseInput) {
+        log.debug("createTestcases: {}, {}", questionId, testcaseInput);
+        return testcaseService.createTestcases(questionId, testcaseInput);
     }
 
     @MutationMapping(name = "createCustomTestcases")
-    public List<CustomTestcase> createCustomTestcases(Authentication authentication, @Argument Long questionId, @Argument List<CreateCustomTestcaseInput> inputs) {
-        log.debug("createCustomTestcases: {}, {}", questionId, inputs);
+    public List<CustomTestcase> createCustomTestcases(Authentication authentication, @Argument Long questionId, @Argument List<CreateCustomTestcaseInput> testcaseInput) {
+        log.debug("createCustomTestcases: {}, {}", questionId, testcaseInput);
         if (!authentication.isAuthenticated()) {
             return null;
         }
-        return createCustomTestcases(authentication.getName(), questionId, inputs);
+        return createCustomTestcases(authentication.getName(), questionId, testcaseInput);
     }
 
-    public List<CustomTestcase> createCustomTestcases(String userId, Long questionId, List<CreateCustomTestcaseInput> inputs) {
-        return testcaseService.createCustomTestcases(userId, questionId, inputs);
+    public List<CustomTestcase> createCustomTestcases(String userId, Long questionId, List<CreateCustomTestcaseInput> testcaseInput) {
+        return testcaseService.createCustomTestcases(userId, questionId, testcaseInput);
     }
 
     @MutationMapping(name = "updateTestcase")
-    public Testcase updateTestcase(@Argument Long id, @Argument UpdateTestcaseInput input) {
-        log.debug("updateTestcase: {}, {}", id, input);
-        return testcaseService.updateTestcase(id, input);
+    public Testcase updateTestcase(@Argument Long testcaseId, @Argument UpdateTestcaseInput testcaseInput) {
+        log.debug("updateTestcase: {}, {}", testcaseId, testcaseInput);
+        return testcaseService.updateTestcase(testcaseId, testcaseInput);
     }
 
     @MutationMapping(name = "updateCustomTestcase")
-    public CustomTestcase updateCustomTestcase(@Argument Long id, @Argument UpdateCustomTestcaseInput input) {
-        log.debug("updateCustomTestcase: {}, {}", id, input);
-        return testcaseService.updateCustomTestcase(id, input);
+    public CustomTestcase updateCustomTestcase(@Argument Long testcaseId, @Argument UpdateCustomTestcaseInput testcaseInput) {
+        log.debug("updateCustomTestcase: {}, {}", testcaseId, testcaseInput);
+        return testcaseService.updateCustomTestcase(testcaseId, testcaseInput);
     }
 
     @MutationMapping(name = "deleteTestcase")
-    public Testcase deleteTestcase(@Argument Long id) {
-        log.debug("deleteTestcase: {}", id);
-        return testcaseService.deleteTestcase(id);
+    public Testcase deleteTestcase(@Argument Long testcaseId) {
+        log.debug("deleteTestcase: {}", testcaseId);
+        return testcaseService.deleteTestcase(testcaseId);
     }
 
     @MutationMapping(name = "deleteCustomTestcase")
-    public CustomTestcase deleteCustomTestcase(@Argument Long id) {
-        log.debug("deleteCustomTestcase: {}", id);
-        return testcaseService.deleteCustomTestcase(id);
+    public CustomTestcase deleteCustomTestcase(@Argument Long testcaseId) {
+        log.debug("deleteCustomTestcase: {}", testcaseId);
+        return testcaseService.deleteCustomTestcase(testcaseId);
     }
 }
