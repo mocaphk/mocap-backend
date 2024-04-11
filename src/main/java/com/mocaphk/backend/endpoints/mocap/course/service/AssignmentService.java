@@ -10,12 +10,16 @@ import com.mocaphk.backend.endpoints.mocap.user.model.MocapUser;
 import com.mocaphk.backend.endpoints.mocap.user.repository.MocapUserRepository;
 import com.mocaphk.backend.endpoints.mocap.user.service.MocapUserService;
 import com.mocaphk.backend.endpoints.mocap.workspace.model.Question;
+import com.mocaphk.backend.endpoints.mocap.workspace.service.AttemptService;
+import com.mocaphk.backend.enums.CourseRole;
 import com.mocaphk.backend.utils.DateUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -26,6 +30,8 @@ public class AssignmentService {
     private final MocapUserRepository mocapUserRepository;
     private final CourseUserRepository courseUserRepository;
     private final MocapUserService mocapUserService;
+    private final AttemptService attemptService;
+    private final CourseUserService courseUserService;
     private final MocapMailSender mocapMailSender;
 
     public Assignment getAssignmentById(Long id, String userId) {
@@ -48,6 +54,15 @@ public class AssignmentService {
         }
 
         return assignment;
+    }
+
+    public List<Assignment> getAssignmentsBetween(String userId, String start, String end) {
+        List<Course> courses = courseUserService.getCoursesByUserId(userId);
+        List<Assignment> assignments = new ArrayList<>();
+        for (Course course : courses) {
+            assignments.addAll(assignmentRepository.findByCourseIdAndDateDueBetween(course.getId(), start, end));
+        }
+        return assignments.stream().sorted(Comparator.comparing(Assignment::getDateDue)).toList();
     }
 
     public Assignment createAssignment(CreateAssignmentInput input, String userId) {
@@ -103,5 +118,20 @@ public class AssignmentService {
                     DateUtils.parse(assignment.getDateOpen())
             );
         }
+    }
+    
+    public Integer getCompletion(String userId, Assignment assignment) {
+        if (assignment.getQuestions().isEmpty()) {
+            return 100;
+        }
+        int total = 0;
+        int completed = 0;
+        for (Question question : assignment.getQuestions()) {
+            if (attemptService.getLatestSubmissionByQuestionId(userId, question.getId()) != null) {
+                completed++;
+            }
+            total++;
+        }
+        return (int) Math.round((double) completed / total * 100);
     }
 }

@@ -36,6 +36,12 @@ public class AttemptController {
         return attemptService.getAttemptsByQuestionId(authentication.getName() , questionId);
     }
 
+    @QueryMapping(name = "latestSubmission")
+    public Attempt getLatestSubmission(@Argument String userId, @Argument Long questionId) {
+        log.debug("getLatestSubmission: {}, {}", userId, questionId);
+        return attemptService.getLatestSubmissionByQuestionId(userId, questionId);
+    }
+
     @MutationMapping(name = "createAttempt")
     public Attempt createAttempt(Authentication authentication, @Argument CreateAttemptInput attemptInput) {
         log.debug("createAttempt: {}", attemptInput);

@@ -8,6 +8,7 @@ import com.mocaphk.backend.endpoints.mocap.course.repository.CourseRepository;
 import com.mocaphk.backend.endpoints.mocap.course.repository.CourseUserRepository;
 import com.mocaphk.backend.endpoints.mocap.user.model.MocapUser;
 import com.mocaphk.backend.endpoints.mocap.user.repository.MocapUserRepository;
+import com.mocaphk.backend.endpoints.mocap.workspace.model.Question;
 import com.mocaphk.backend.enums.CourseRole;
 import com.mocaphk.backend.utils.DateUtils;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class CourseService {
     private final CourseRepository courseRepository;
     private final CourseUserRepository courseUserRepository;
     private final MocapUserRepository mocapUserRepository;
+    private final AssignmentService assignmentService;
 
     public Course getCourseById(Long id, String userId) {
         CourseUserId courseUserId = new CourseUserId(id, userId);
@@ -92,5 +94,15 @@ public class CourseService {
         courseUserRepository.save(courseUser);
 
         return course;
+    }
+
+    public Integer getCompletion(String userId, Course course) {
+        int total = 0;
+        int completed = 0;
+        for (Assignment assignment : course.getAssignments()) {
+            completed += assignmentService.getCompletion(userId, assignment);
+            total += 100;
+        }
+        return (int) Math.round((double) completed / total * 100);
     }
 }

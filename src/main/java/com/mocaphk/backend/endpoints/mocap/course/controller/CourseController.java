@@ -5,6 +5,7 @@ import com.mocaphk.backend.endpoints.mocap.course.dto.SearchCourseUsersByUsernam
 import com.mocaphk.backend.endpoints.mocap.course.model.Announcement;
 import com.mocaphk.backend.endpoints.mocap.course.dto.CreateCourseUserInput;
 import com.mocaphk.backend.endpoints.mocap.course.dto.GetCourseUserOutput;
+import com.mocaphk.backend.endpoints.mocap.course.model.Assignment;
 import com.mocaphk.backend.endpoints.mocap.course.model.Course;
 import com.mocaphk.backend.endpoints.mocap.course.model.CourseUser;
 import com.mocaphk.backend.endpoints.mocap.course.service.CourseService;
@@ -145,5 +146,11 @@ public class CourseController {
 
         log.debug("deleteAnnouncement: courseId = {}, userId = {}", courseId, userId);
         return courseUserService.deleteCourseUser(courseId, userId, authentication.getName());
+    }
+
+    @SchemaMapping
+    public Integer completion(Course course, Authentication authentication) {
+        log.debug("Course completion: course = {}, authentication = {}", course, authentication);
+        return courseService.getCompletion(authentication.getName(), course);
     }
 }
