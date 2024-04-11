@@ -19,8 +19,6 @@ public class Testcase extends BaseTestcase {
 
     @Override
     public boolean check(CodeExecutionResult result, CodeExecutionResult sampleResult) {
-        result.setTestcaseId(getId());
-        sampleResult.setTestcaseId(getId());
         if (getQuestion().getCheckingMethod() == CheckingMethod.CONSOLE) {
             String output = combineOutput(result.getOutput());
             if (output.equals(getExpectedOutput())) {

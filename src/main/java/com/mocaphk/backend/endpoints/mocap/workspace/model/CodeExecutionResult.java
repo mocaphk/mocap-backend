@@ -37,15 +37,14 @@ public class CodeExecutionResult {
     @JoinColumn(name = "attempt_result_id", insertable = false, updatable = false)
     private AttemptResult attemptResult;
 
-    @Column(name = "testcase_id")
-    private Long testcaseId;
-
-    @ManyToOne
-    @JoinColumn(name = "testcase_id", insertable = false, updatable = false)
-    private BaseTestcase testcase;
+    @ElementCollection
+    private List<TestcaseInputEntry> input;
 
     @ElementCollection
     private List<CodeExecutionOutput> output;
+
+    @ElementCollection
+    private List<CodeExecutionOutput> sampleOutput;
 
     private Boolean isExecutionSuccess;
 

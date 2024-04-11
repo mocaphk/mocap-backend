@@ -13,6 +13,8 @@ import com.mocaphk.backend.endpoints.mocap.workspace.dto.UpdateAttemptInput;
 import com.mocaphk.backend.endpoints.mocap.workspace.model.Attempt;
 import com.mocaphk.backend.endpoints.mocap.workspace.service.AttemptService;
 
+import java.util.List;
+
 @Controller
 @Slf4j
 @RequiredArgsConstructor
@@ -23,6 +25,15 @@ public class AttemptController {
     public Attempt getAttemptById(@Argument Long attemptId) {
         log.debug("getAttemptById: {}", attemptId);
         return attemptService.getAttemptById(attemptId);
+    }
+
+    @QueryMapping(name = "attempts")
+    public List<Attempt> getAttemptsByQuestionId(Authentication authentication, @Argument Long questionId) {
+        log.debug("getAttemptsByQuestionId: {}", questionId);
+        if (!authentication.isAuthenticated()) {
+            return null;
+        }
+        return attemptService.getAttemptsByQuestionId(authentication.getName() , questionId);
     }
 
     @MutationMapping(name = "createAttempt")

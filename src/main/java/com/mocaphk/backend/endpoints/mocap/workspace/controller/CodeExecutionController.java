@@ -40,6 +40,18 @@ public class CodeExecutionController {
         return codeExecutionService.runTestcase(attemptId, testcaseId);
     }
 
+    @QueryMapping(name = "runTestcaseWithCode")
+    public CodeExecutionResult runTestcaseWithCode(@Argument Long questionId, @Argument Long testcaseId, @Argument String code) throws IOException {
+        log.debug("runTestcaseWithCode: {}, {}, {}", questionId, testcaseId, code);
+        return codeExecutionService.runTestcaseWithCode(questionId, testcaseId, code);
+    }
+
+    @QueryMapping(name = "runAllTestcasesWithCode")
+    public AttemptResult runAllTestcasesWithCode(@Argument Long questionId, @Argument String code) throws IOException {
+        log.debug("runAllTestcasesWithCode: {}, {}", questionId, code);
+        return codeExecutionService.runTestcasesWithCode(questionId, code);
+    }
+
     @MutationMapping(name = "submitAttempt")
     public AttemptResult submitAttempt(@Argument Long attemptId) throws IOException {
         log.debug("submitAttempt: {}", attemptId);

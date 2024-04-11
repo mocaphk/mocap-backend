@@ -35,6 +35,7 @@ public class CodeExecutionService {
     private final CodeExecutionResultRepository codeExecutionResultRepository;
     private final AttemptService attemptService;
     private final TestcaseService testcaseService;
+    private final QuestionService questionService;
     private final DockerManager dockerManager;
 
     public AttemptResult runAttempt(Long attemptId) throws IOException {
@@ -71,6 +72,7 @@ public class CodeExecutionService {
             attempt.setExecutedAt(DateUtils.now());
             CodeExecutionResult sampleResult = execute(question.getSampleCode(), question, codingEnvironment, testcase);
             testcase.check(result, sampleResult);
+            result.setSampleOutput(sampleResult.getOutput());
             result.setAttemptResultId(attemptResult.getId());
             results.add(result);
         }
@@ -96,7 +98,53 @@ public class CodeExecutionService {
         CodeExecutionResult result = execute(attempt.getCode(), question, codingEnvironment, testcase);
         CodeExecutionResult sampleResult = execute(question.getSampleCode(), question, codingEnvironment, testcase);
         testcase.check(result, sampleResult);
+        result.setSampleOutput(sampleResult.getOutput());
         return result;
+    }
+
+    public CodeExecutionResult runTestcaseWithCode(Long questionId, Long testcaseId, String code) throws IOException {
+        Question question = questionService.getQuestionById(questionId);
+        BaseTestcase testcase = testcaseService.getBaseTestcaseById(testcaseId);
+        if (testcase == null) {
+            log.error("Testcase not found");
+            return null;
+        }
+        CodingEnvironment codingEnvironment = question.getCodingEnvironment();
+        if (codingEnvironment == null || !codingEnvironment.getIsBuilt()) {
+            log.error("Coding environment not found or not built");
+            return null;
+        }
+        CodeExecutionResult result = execute(code, question, codingEnvironment, testcase);
+        result.setSampleOutput(result.getOutput());
+        return result;
+    }
+
+    public AttemptResult runTestcasesWithCode(Long questionId, String code) throws IOException {
+        Question question = questionService.getQuestionById(questionId);
+        List<BaseTestcase> allTestcases = new ArrayList<>(question.getTestcases());
+        if (allTestcases.isEmpty()) {
+            CustomTestcase defaultTestcase = new CustomTestcase();
+            defaultTestcase.setQuestion(question);
+            allTestcases.add(defaultTestcase);
+        }
+        CodingEnvironment codingEnvironment = question.getCodingEnvironment();
+        if (codingEnvironment == null || !codingEnvironment.getIsBuilt()) {
+            log.error("Coding environment not found or not built");
+            return null;
+        }
+
+        AttemptResult attemptResult = new AttemptResult();
+        attemptResult.setCreatedAt(DateUtils.now());
+
+        List<CodeExecutionResult> results = new ArrayList<>();
+        for (var testcase : allTestcases) {
+            CodeExecutionResult result = execute(code, question, codingEnvironment, testcase);
+            result.setSampleOutput(result.getOutput());
+            results.add(result);
+        }
+        attemptResult.setResults(results);
+
+        return attemptResult;
     }
 
     public AttemptResult submitAttempt(Long attemptId) throws IOException {
@@ -129,6 +177,7 @@ public class CodeExecutionService {
             attempt.setExecutedAt(DateUtils.now());
             CodeExecutionResult sampleResult = execute(question.getSampleCode(), question, codingEnvironment, testcase);
             testcase.check(result, sampleResult);
+            result.setSampleOutput(sampleResult.getOutput());
             result.setAttemptResultId(attemptResult.getId());
             codeExecutionResultRepository.save(result);
             results.add(result);
@@ -164,7 +213,10 @@ public class CodeExecutionService {
         String fileName = dockerManager.copyFileToContainer(containerId, code, "/");
 
         CodeExecutionResult result = new CodeExecutionResult();
-        result.setTestcaseId(testcase.getId());
+        result.setInput(new ArrayList<>());
+        for (TestcaseInputEntry input : testcase.getInput()) {
+            result.getInput().add(new TestcaseInputEntry(input.getName(), input.getValue()));
+        }
         result.setIsExecutionSuccess(true);
         result.setIsExceedTimeLimit(true);
 

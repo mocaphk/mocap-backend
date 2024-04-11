@@ -12,6 +12,7 @@ import com.mocaphk.backend.endpoints.mocap.workspace.repository.AttemptRepositor
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -24,14 +25,12 @@ public class AttemptService {
     }
 
     public List<Attempt> getAttemptsByQuestionId(String userId, Long questionId) {
-        return attemptRepository.findByUserIdAndQuestionId(userId, questionId);
+        return attemptRepository.findTop5ByUserIdAndQuestionIdAndIsSubmittedTrueOrderByUpdatedAtDesc(userId, questionId)
+                .stream()
+                .sorted(Comparator.comparing(Attempt::getUpdatedAt))
+                .collect(Collectors.toList());
     }
 
-    public Attempt getLatestAttemptByQuestionId(String userId, Long questionId) {
-        return attemptRepository.findByUserIdAndQuestionId(userId, questionId).stream()
-                .max(Comparator.comparing(a -> DateUtils.parse(a.getUpdatedAt())))
-                .orElse(null);
-    }
 
     public Attempt createAttempt(String userId, CreateAttemptInput input) {
         Attempt attempt = new Attempt();
