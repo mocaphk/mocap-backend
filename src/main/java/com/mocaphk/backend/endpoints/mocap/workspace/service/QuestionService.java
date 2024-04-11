@@ -11,6 +11,7 @@ import com.mocaphk.backend.endpoints.mocap.workspace.model.Question;
 import com.mocaphk.backend.endpoints.mocap.workspace.repository.QuestionRepository;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -82,4 +83,9 @@ public class QuestionService {
         questionRepository.delete(question);
         return question;
     }
+
+    public List<Question> searchPublicQuestions(String code, String keyword) {
+        return questionRepository.searchPublicQuestions(code, keyword);
+    }
+
 }

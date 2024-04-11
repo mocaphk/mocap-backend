@@ -1,5 +1,6 @@
 package com.mocaphk.backend.endpoints.mocap.workspace.controller;
 
+import com.mocaphk.backend.endpoints.mocap.workspace.dto.SearchPublicQuestionsInput;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -12,6 +13,8 @@ import com.mocaphk.backend.endpoints.mocap.workspace.dto.UpdateQuestionInput;
 import com.mocaphk.backend.endpoints.mocap.workspace.model.Question;
 import com.mocaphk.backend.endpoints.mocap.workspace.service.QuestionService;
 
+import java.util.List;
+
 @Controller
 @Slf4j
 @RequiredArgsConstructor
@@ -22,6 +25,12 @@ public class QuestionController {
     public Question getQuestionById(@Argument Long id) {
         log.debug("getQuestionById: {}", id);
         return questionService.getQuestionById(id);
+    }
+
+    @QueryMapping(name = "searchPublicQuestions")
+    public List<Question> searchPublicQuestions(@Argument SearchPublicQuestionsInput searchPublicQuestionsInput) {
+        log.debug("searchPublicQuestions: {}", searchPublicQuestionsInput);
+        return questionService.searchPublicQuestions(searchPublicQuestionsInput.courseCode(), searchPublicQuestionsInput.keyword());
     }
 
     @MutationMapping(name = "createQuestion")

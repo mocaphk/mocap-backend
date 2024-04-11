@@ -12,6 +12,8 @@ import com.mocaphk.backend.enums.CourseRole;
 import com.mocaphk.backend.utils.DateUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -36,6 +38,14 @@ public class CourseService {
         }
 
         return courseRepository.findById(id).orElse(null);
+    }
+
+    public List<String> getCodes() {
+        return courseRepository.findAllCodes();
+    }
+
+    public List<Course> getCoursesByCode(String courseCode) {
+        return courseRepository.findAllByCode(courseCode);
     }
 
     public Course createCourse(CreateCourseInput input, String userId) {
