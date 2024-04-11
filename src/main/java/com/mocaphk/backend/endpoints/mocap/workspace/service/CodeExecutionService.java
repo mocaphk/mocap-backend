@@ -214,8 +214,13 @@ public class CodeExecutionService {
 
         CodeExecutionResult result = new CodeExecutionResult();
         result.setInput(new ArrayList<>());
-        for (TestcaseInputEntry input : testcase.getInput()) {
-            result.getInput().add(new TestcaseInputEntry(input.getName(), input.getValue()));
+        if (testcase != null) {
+            for (TestcaseInputEntry input : testcase.getInput()) {
+                result.getInput().add(new TestcaseInputEntry(input.getName(), input.getValue()));
+            }
+            result.setIsHidden(testcase.getIsHidden());
+        } else {
+            result.setIsHidden(false);
         }
         result.setIsExecutionSuccess(true);
         result.setIsExceedTimeLimit(true);

@@ -18,6 +18,11 @@ public class Testcase extends BaseTestcase {
     private Boolean isHidden;
 
     @Override
+    public Boolean getIsHidden() {
+        return this.isHidden;
+    }
+
+    @Override
     public boolean check(CodeExecutionResult result, CodeExecutionResult sampleResult) {
         if (getQuestion().getCheckingMethod() == CheckingMethod.CONSOLE) {
             String output = combineOutput(result.getOutput());

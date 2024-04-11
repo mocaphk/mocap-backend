@@ -52,6 +52,8 @@ public class CodeExecutionResult {
 
     private Boolean isExceedTimeLimit;
 
+    private Boolean isHidden;
+
     public static String combineOutput(List<CodeExecutionOutput> output, CodeStream streamType) {
         return output.stream()
                 .filter(o -> o.getStreamType() == streamType)
