@@ -25,6 +25,11 @@ public abstract class BaseTestcase {
     @JoinColumn(name = "question_id", insertable = false, updatable = false)
     private Question question;
 
+    // TODO: temporary solution, need to find a better way to handle this
+    public Boolean getIsHidden() {
+        return false;
+    }
+
     /**
      * Check whether the result of the code execution with this testcase is correct,
      * will set the result's isCorrect field to true if the result is correct, or otherwise.
