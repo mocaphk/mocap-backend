@@ -39,6 +39,12 @@ public class QuestionController {
         return questionService.createQuestion(questionInput);
     }
 
+    @MutationMapping(name = "copyQuestionToAssignment")
+    public Question copyQuestionToAssignment(@Argument Long questionId, @Argument Long assignmentId) {
+        log.debug("copyQuestionToAssignment: {}, {}", questionId, assignmentId);
+        return questionService.copyQuestionToAssignment(questionId, assignmentId);
+    }
+
     @MutationMapping(name = "updateQuestion")
     public Question updateQuestion(@Argument Long id, @Argument UpdateQuestionInput questionInput) {
         log.debug("updateQuestion: {}, {}", id, questionInput);

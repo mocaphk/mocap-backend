@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -39,4 +40,12 @@ public abstract class BaseTestcase {
      * @return true if the result is correct, false otherwise
      */
     public abstract boolean check(CodeExecutionResult result, CodeExecutionResult sampleResult);
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof BaseTestcase o) {
+            return Objects.equals(o.id, this.id);
+        }
+        return false;
+    }
 }

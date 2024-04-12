@@ -12,4 +12,5 @@ public record UpdateQuestionInput (
         Long codingEnvironmentId,
         String execCommand,
         Integer timeLimit,
-        Long assignmentId) { }
+        Long assignmentId,
+        Boolean isPublic) { }

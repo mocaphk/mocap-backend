@@ -14,4 +14,5 @@ public record CreateQuestionInput (
         Long codingEnvironmentId,
         String execCommand,
         @DefaultValue("1000") Integer timeLimit,
-        Long assignmentId) { }
+        Long assignmentId,
+        Boolean isPublic) { }

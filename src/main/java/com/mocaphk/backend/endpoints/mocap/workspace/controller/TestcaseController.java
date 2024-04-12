@@ -10,9 +10,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
 import com.mocaphk.backend.endpoints.mocap.workspace.dto.CreateCustomTestcaseInput;
-import com.mocaphk.backend.endpoints.mocap.workspace.dto.CreateTestcaseInput;
+import com.mocaphk.backend.endpoints.mocap.workspace.dto.CreateAndUpdateTestcaseInput;
 import com.mocaphk.backend.endpoints.mocap.workspace.dto.UpdateCustomTestcaseInput;
-import com.mocaphk.backend.endpoints.mocap.workspace.dto.UpdateTestcaseInput;
 import com.mocaphk.backend.endpoints.mocap.workspace.model.CustomTestcase;
 import com.mocaphk.backend.endpoints.mocap.workspace.model.Testcase;
 import com.mocaphk.backend.endpoints.mocap.workspace.service.TestcaseService;
@@ -57,10 +56,10 @@ public class TestcaseController {
         return testcaseService.getCustomTestcasesByQuestionId(userId, questionId);
     }
 
-    @MutationMapping(name = "createTestcases")
-    public List<Testcase> createTestcases(@Argument Long questionId, @Argument List<CreateTestcaseInput> testcaseInput) {
-        log.debug("createTestcases: {}, {}", questionId, testcaseInput);
-        return testcaseService.createTestcases(questionId, testcaseInput);
+    @MutationMapping(name = "createAndUpdateTestcases")
+    public List<Testcase> createAndUpdateTestcases(@Argument Long questionId, @Argument List<CreateAndUpdateTestcaseInput> testcaseInput) {
+        log.debug("createAndUpdateTestcases: {}, {}", questionId, testcaseInput);
+        return testcaseService.createAndUpdateTestcases(questionId, testcaseInput);
     }
 
     @MutationMapping(name = "createCustomTestcases")
@@ -74,12 +73,6 @@ public class TestcaseController {
 
     public List<CustomTestcase> createCustomTestcases(String userId, Long questionId, List<CreateCustomTestcaseInput> testcaseInput) {
         return testcaseService.createCustomTestcases(userId, questionId, testcaseInput);
-    }
-
-    @MutationMapping(name = "updateTestcase")
-    public Testcase updateTestcase(@Argument Long testcaseId, @Argument UpdateTestcaseInput testcaseInput) {
-        log.debug("updateTestcase: {}, {}", testcaseId, testcaseInput);
-        return testcaseService.updateTestcase(testcaseId, testcaseInput);
     }
 
     @MutationMapping(name = "updateCustomTestcase")

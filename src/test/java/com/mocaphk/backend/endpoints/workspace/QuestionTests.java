@@ -33,7 +33,8 @@ public class QuestionTests {
                         1L,
                         "python {mainFile}",
                         1000,
-                        1L
+                        1L,
+                        false
                 )
         );
         assertThat(question.getId()).isNotNull();
@@ -58,7 +59,8 @@ public class QuestionTests {
                         null,
                         null,
                         null,
-                        null
+                        null,
+                        false
                 )
         );
         assertThat(question.getId()).isEqualTo(1L);
@@ -76,7 +78,8 @@ public class QuestionTests {
                         1L,
                         "python {mainFile}",
                         1000,
-                        1L
+                        1L,
+                        false
                 )
         );
         Question question = questionController.deleteQuestion(create.getId());

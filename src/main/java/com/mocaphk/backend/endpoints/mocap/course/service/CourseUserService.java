@@ -1,10 +1,8 @@
 package com.mocaphk.backend.endpoints.mocap.course.service;
 
 import com.mocaphk.backend.endpoints.mocap.course.dto.GetCourseUserOutput;
-import com.mocaphk.backend.endpoints.mocap.course.model.Course;
-import com.mocaphk.backend.endpoints.mocap.course.model.CourseUser;
-import com.mocaphk.backend.endpoints.mocap.course.model.CourseUserId;
-import com.mocaphk.backend.endpoints.mocap.course.model.CourseUserRole;
+import com.mocaphk.backend.endpoints.mocap.course.model.*;
+import com.mocaphk.backend.endpoints.mocap.course.repository.AssignmentRepository;
 import com.mocaphk.backend.endpoints.mocap.course.repository.CourseRepository;
 import com.mocaphk.backend.endpoints.mocap.course.repository.CourseUserRepository;
 import com.mocaphk.backend.endpoints.mocap.user.dto.GetUserOutput;
@@ -26,6 +24,7 @@ public class CourseUserService {
     private final CourseUserRepository courseUserRepository;
     private final MocapUserRepository mocapUserRepository;
     private final CourseRepository courseRepository;
+    private final AssignmentRepository assignmentRepository;
 
     public List<CourseRole> getCourseUserRoles(Long courseId, String userId) {
         CourseUserId id = new CourseUserId(courseId, userId);
@@ -36,6 +35,16 @@ public class CourseUserService {
         }
 
         return courseUser.getRoles().stream().map(CourseUserRole::getRole).toList();
+    }
+
+    public List<CourseRole> getAssignmentUserRoles(Long assignmentId, String userId) {
+        Assignment assignment = assignmentRepository.findById(assignmentId).orElse(null);
+
+        if (assignment == null) {
+            return null;
+        }
+
+        return getCourseUserRoles(assignment.getCourse().getId(), userId);
     }
 
     public List<Course> getCoursesByUserId(String userId) {

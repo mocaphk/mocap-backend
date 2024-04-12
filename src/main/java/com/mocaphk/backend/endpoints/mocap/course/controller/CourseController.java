@@ -67,6 +67,15 @@ public class CourseController {
         return courseUserService.getCourseUserRoles(courseId, authentication.getName());
     }
 
+    @QueryMapping(name = "getAssignmentUserRoles")
+    public List<CourseRole> getAssignmentUserRoles(Authentication authentication, @Argument Long assignmentId) {
+        log.debug("getAssignmentUserRoles {}", assignmentId);
+        if (!authentication.isAuthenticated()) {
+            return null;
+        }
+        return courseUserService.getAssignmentUserRoles(assignmentId, authentication.getName());
+    }
+
     @QueryMapping(name = "courseUsers")
     public List<GetCourseUserOutput> getUsersByCourseId(Authentication authentication, @Argument Long id) {
         log.debug("courseUsers {}", id);

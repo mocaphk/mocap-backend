@@ -1,5 +1,8 @@
 package com.mocaphk.backend.endpoints.mocap.workspace.service;
 
+import com.mocaphk.backend.endpoints.mocap.workspace.dto.CreateAndUpdateTestcaseInput;
+import com.mocaphk.backend.endpoints.mocap.workspace.dto.TestcaseInputEntryInput;
+import com.mocaphk.backend.endpoints.mocap.workspace.model.Testcase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -18,6 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class QuestionService {
     private final QuestionRepository questionRepository;
+    private final TestcaseService testcaseService;
 
     public Question getQuestionById(Long id) {
         return questionRepository.findById(id).orElse(null);
@@ -35,6 +39,7 @@ public class QuestionService {
         question.setTimeLimit(input.timeLimit());
         question.setAssignmentId(input.assignmentId());
         question.setTestcases(new ArrayList<>());
+        question.setIsPublic(input.isPublic() != null && input.isPublic());
         questionRepository.save(question);
         return question;
     }
@@ -71,8 +76,48 @@ public class QuestionService {
         if (input.assignmentId() != null) {
             question.setAssignmentId(input.assignmentId());
         }
+        if (input.isPublic() != null) {
+            question.setIsPublic(input.isPublic());
+        }
         questionRepository.save(question);
         return question;
+    }
+
+    public Question copyQuestionToAssignment(Long questionId, Long assignmentId) {
+        Question question = getQuestionById(questionId);
+        if (question == null) {
+            return null;
+        }
+        Question newQuestion = new Question();
+        newQuestion.setTitle(question.getTitle());
+        newQuestion.setDescription(question.getDescription());
+        newQuestion.setLanguage(question.getLanguage());
+        newQuestion.setSampleCode(question.getSampleCode());
+        newQuestion.setCheckingMethod(question.getCheckingMethod());
+        newQuestion.setCodingEnvironmentId(question.getCodingEnvironmentId());
+        newQuestion.setExecCommand(question.getExecCommand());
+        newQuestion.setTimeLimit(question.getTimeLimit());
+        newQuestion.setAssignmentId(assignmentId);
+        newQuestion.setTestcases(new ArrayList<>());
+        newQuestion.setIsPublic(question.getIsPublic());
+        questionRepository.save(newQuestion);
+
+        // Save testcases
+        List<CreateAndUpdateTestcaseInput> testcaseInputs = new ArrayList<>();
+        for (Testcase testcase : question.getTestcases()) {
+            CreateAndUpdateTestcaseInput input = new CreateAndUpdateTestcaseInput(
+                    null,
+                    testcase.getInput().stream().map(
+                            i -> new TestcaseInputEntryInput(i.getName(), i.getValue())
+                    ).toList(),
+                    testcase.getExpectedOutput(),
+                    testcase.getIsHidden()
+            );
+            testcaseInputs.add(input);
+        }
+        testcaseService.createAndUpdateTestcases(newQuestion.getId(), testcaseInputs);
+
+        return newQuestion;
     }
 
     public Question deleteQuestion(Long id) {
