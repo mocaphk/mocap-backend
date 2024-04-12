@@ -24,6 +24,9 @@ public class CustomTestcase extends BaseTestcase {
 
     @Override
     public boolean check(CodeExecutionResult result, CodeExecutionResult sampleResult) {
+        if (result == null) {
+            return false;
+        }
         if (getQuestion().getCheckingMethod() == CheckingMethod.CONSOLE) {
             String output = combineOutput(result.getOutput());
             if (sampleResult != null && combineOutput(sampleResult.getOutput()).equals(output)) {
