@@ -4,7 +4,8 @@ import org.springframework.lang.NonNull;
 
 import java.util.List;
 
-public record CreateTestcaseInput (
+public record CreateAndUpdateTestcaseInput(
+        Long id,
         @NonNull List<TestcaseInputEntryInput> input,
         String expectedOutput,
-        @NonNull Boolean isHidden) { }
+        Boolean isHidden) { }

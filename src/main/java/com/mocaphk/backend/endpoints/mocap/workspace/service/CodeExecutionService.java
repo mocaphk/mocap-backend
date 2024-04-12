@@ -3,6 +3,7 @@ package com.mocaphk.backend.endpoints.mocap.workspace.service;
 import com.github.dockerjava.api.async.ResultCallback;
 import com.github.dockerjava.api.model.Frame;
 import com.mocaphk.backend.components.DockerManager;
+import com.mocaphk.backend.endpoints.mocap.workspace.dto.TestcaseInputEntryInput;
 import com.mocaphk.backend.endpoints.mocap.workspace.model.*;
 import com.mocaphk.backend.endpoints.mocap.workspace.repository.AttemptResultRepository;
 import com.mocaphk.backend.endpoints.mocap.workspace.repository.CodeExecutionResultRepository;
@@ -34,15 +35,12 @@ public class CodeExecutionService {
     private final AttemptResultRepository attemptResultRepository;
     private final CodeExecutionResultRepository codeExecutionResultRepository;
     private final AttemptService attemptService;
-    private final TestcaseService testcaseService;
     private final QuestionService questionService;
     private final DockerManager dockerManager;
 
-    public AttemptResult runAttempt(Long attemptId) throws IOException {
+    public AttemptResult runAttempt(Long attemptId, List<List<TestcaseInputEntryInput>> testcaseInputs) throws IOException {
         Attempt attempt = attemptService.getAttemptById(attemptId);
         Question question = attempt.getQuestion();
-        List<Testcase> testcases = question.getTestcases();
-        List<CustomTestcase> customTestcases = testcaseService.getCustomTestcasesByQuestionId(attempt.getUserId(), question.getId());
         CodingEnvironment codingEnvironment = question.getCodingEnvironment();
         if (codingEnvironment == null || !codingEnvironment.getIsBuilt()) {
             log.error("Coding environment not found or not built");
@@ -55,16 +53,18 @@ public class CodeExecutionService {
 
         List<CodeExecutionResult> results = new ArrayList<>();
 
-        List<BaseTestcase> allTestcases = new ArrayList<>(
-                Stream.concat(
-                        testcases.stream(),
-                        customTestcases.stream()
-                ).toList()
-        );
-        if (allTestcases.isEmpty()) {
+        List<BaseTestcase> allTestcases = new ArrayList<>();
+        if (testcaseInputs == null || testcaseInputs.isEmpty()) {
             CustomTestcase defaultTestcase = new CustomTestcase();
             defaultTestcase.setQuestion(question);
             allTestcases.add(defaultTestcase);
+        } else {
+            for (var input : testcaseInputs) {
+                CustomTestcase customTestcase = new CustomTestcase();
+                customTestcase.setQuestion(question);
+                customTestcase.setInput(input.stream().map(i -> new TestcaseInputEntry(i.name(), i.value())).toList());
+                allTestcases.add(customTestcase);
+            }
         }
 
         for (var testcase : allTestcases) {
@@ -81,19 +81,22 @@ public class CodeExecutionService {
         return attemptResult;
     }
 
-    public CodeExecutionResult runTestcase(Long attemptId, Long testcaseId) throws IOException {
+    public CodeExecutionResult runTestcase(Long attemptId, List<TestcaseInputEntryInput> testcaseInput) throws IOException {
         Attempt attempt = attemptService.getAttemptById(attemptId);
         Question question = attempt.getQuestion();
-        BaseTestcase testcase = testcaseService.getBaseTestcaseById(testcaseId);
-        if (testcase == null) {
-            log.error("Testcase not found");
-            return null;
-        }
         CodingEnvironment codingEnvironment = question.getCodingEnvironment();
         if (codingEnvironment == null || !codingEnvironment.getIsBuilt()) {
             log.error("Coding environment not found or not built");
             return null;
         }
+
+        if (testcaseInput == null) {
+            log.error("Testcase is null");
+            return null;
+        }
+        CustomTestcase testcase = new CustomTestcase();
+        testcase.setQuestion(question);
+        testcase.setInput(testcaseInput.stream().map(i -> new TestcaseInputEntry(i.name(), i.value())).toList());
 
         CodeExecutionResult result = execute(attempt.getCode(), question, codingEnvironment, testcase);
         CodeExecutionResult sampleResult = execute(question.getSampleCode(), question, codingEnvironment, testcase);
@@ -102,35 +105,47 @@ public class CodeExecutionService {
         return result;
     }
 
-    public CodeExecutionResult runTestcaseWithCode(Long questionId, Long testcaseId, String code) throws IOException {
+    public CodeExecutionResult runTestcaseWithCode(Long questionId, List<TestcaseInputEntryInput> testcaseInput, String code) throws IOException {
         Question question = questionService.getQuestionById(questionId);
-        BaseTestcase testcase = testcaseService.getBaseTestcaseById(testcaseId);
-        if (testcase == null) {
-            log.error("Testcase not found");
-            return null;
-        }
         CodingEnvironment codingEnvironment = question.getCodingEnvironment();
         if (codingEnvironment == null || !codingEnvironment.getIsBuilt()) {
             log.error("Coding environment not found or not built");
             return null;
         }
+
+        if (testcaseInput == null) {
+            log.error("Testcase is null");
+            return null;
+        }
+        CustomTestcase testcase = new CustomTestcase();
+        testcase.setQuestion(question);
+        testcase.setInput(testcaseInput.stream().map(i -> new TestcaseInputEntry(i.name(), i.value())).toList());
+
         CodeExecutionResult result = execute(code, question, codingEnvironment, testcase);
         result.setSampleOutput(result.getOutput());
         return result;
     }
 
-    public AttemptResult runTestcasesWithCode(Long questionId, String code) throws IOException {
+    public AttemptResult runTestcasesWithCode(Long questionId, List<List<TestcaseInputEntryInput>> testcaseInputs, String code) throws IOException {
         Question question = questionService.getQuestionById(questionId);
-        List<BaseTestcase> allTestcases = new ArrayList<>(question.getTestcases());
-        if (allTestcases.isEmpty()) {
-            CustomTestcase defaultTestcase = new CustomTestcase();
-            defaultTestcase.setQuestion(question);
-            allTestcases.add(defaultTestcase);
-        }
         CodingEnvironment codingEnvironment = question.getCodingEnvironment();
         if (codingEnvironment == null || !codingEnvironment.getIsBuilt()) {
             log.error("Coding environment not found or not built");
             return null;
+        }
+
+        List<BaseTestcase> allTestcases = new ArrayList<>();
+        if (testcaseInputs == null || testcaseInputs.isEmpty()) {
+            CustomTestcase defaultTestcase = new CustomTestcase();
+            defaultTestcase.setQuestion(question);
+            allTestcases.add(defaultTestcase);
+        } else {
+            for (var input : testcaseInputs) {
+                CustomTestcase customTestcase = new CustomTestcase();
+                customTestcase.setQuestion(question);
+                customTestcase.setInput(input.stream().map(i -> new TestcaseInputEntry(i.name(), i.value())).toList());
+                allTestcases.add(customTestcase);
+            }
         }
 
         AttemptResult attemptResult = new AttemptResult();
@@ -214,7 +229,7 @@ public class CodeExecutionService {
 
         CodeExecutionResult result = new CodeExecutionResult();
         result.setInput(new ArrayList<>());
-        if (testcase != null) {
+        if (testcase != null && testcase.getInput() != null) {
             for (TestcaseInputEntry input : testcase.getInput()) {
                 result.getInput().add(new TestcaseInputEntry(input.getName(), input.getValue()));
             }
@@ -265,7 +280,7 @@ public class CodeExecutionService {
                 return result;
             }
 
-            if (testcase.getId() != null && question.getCheckingMethod() == CheckingMethod.CONSOLE) {
+            if (testcase.getInput() != null && question.getCheckingMethod() == CheckingMethod.CONSOLE) {
                 for (TestcaseInputEntry input : testcase.getInput()) {
                     stdinWrite.write(input.getValue().getBytes());
                     stdinWrite.write("\n".getBytes());

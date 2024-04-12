@@ -1,5 +1,6 @@
 package com.mocaphk.backend.endpoints.mocap.workspace.controller;
 
+import com.mocaphk.backend.endpoints.mocap.workspace.dto.TestcaseInputEntryInput;
 import com.mocaphk.backend.endpoints.mocap.workspace.dto.UpdateAttemptInput;
 import com.mocaphk.backend.endpoints.mocap.workspace.model.Attempt;
 import com.mocaphk.backend.endpoints.mocap.workspace.model.AttemptResult;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.io.IOException;
+import java.util.List;
 
 @Controller
 @Slf4j
@@ -29,27 +31,27 @@ public class CodeExecutionController {
     }
 
     @QueryMapping(name = "runAttempt")
-    public AttemptResult runAttempt(@Argument Long attemptId) throws IOException {
-        log.debug("runAttempt: {}", attemptId);
-        return codeExecutionService.runAttempt(attemptId);
+    public AttemptResult runAttempt(@Argument Long attemptId, @Argument List<List<TestcaseInputEntryInput>> testcaseInputs) throws IOException {
+        log.debug("runAttempt: {}, {}", attemptId, testcaseInputs);
+        return codeExecutionService.runAttempt(attemptId, testcaseInputs);
     }
 
     @QueryMapping(name = "runTestcase")
-    public CodeExecutionResult runTestcase(@Argument Long attemptId, @Argument Long testcaseId) throws IOException {
-        log.debug("runTestcase: {}, {}", attemptId, testcaseId);
-        return codeExecutionService.runTestcase(attemptId, testcaseId);
+    public CodeExecutionResult runTestcase(@Argument Long attemptId, @Argument List<TestcaseInputEntryInput> testcaseInput) throws IOException {
+        log.debug("runTestcase: {}, {}", attemptId, testcaseInput);
+        return codeExecutionService.runTestcase(attemptId, testcaseInput);
     }
 
     @QueryMapping(name = "runTestcaseWithCode")
-    public CodeExecutionResult runTestcaseWithCode(@Argument Long questionId, @Argument Long testcaseId, @Argument String code) throws IOException {
-        log.debug("runTestcaseWithCode: {}, {}, {}", questionId, testcaseId, code);
-        return codeExecutionService.runTestcaseWithCode(questionId, testcaseId, code);
+    public CodeExecutionResult runTestcaseWithCode(@Argument Long questionId, @Argument List<TestcaseInputEntryInput> testcaseInput, @Argument String code) throws IOException {
+        log.debug("runTestcaseWithCode: {}, {}, {}", questionId, testcaseInput, code);
+        return codeExecutionService.runTestcaseWithCode(questionId, testcaseInput, code);
     }
 
     @QueryMapping(name = "runAllTestcasesWithCode")
-    public AttemptResult runAllTestcasesWithCode(@Argument Long questionId, @Argument String code) throws IOException {
-        log.debug("runAllTestcasesWithCode: {}, {}", questionId, code);
-        return codeExecutionService.runTestcasesWithCode(questionId, code);
+    public AttemptResult runAllTestcasesWithCode(@Argument Long questionId, @Argument List<List<TestcaseInputEntryInput>> testcaseInputs, @Argument String code) throws IOException {
+        log.debug("runAllTestcasesWithCode: {}, {}, {}", questionId, testcaseInputs, code);
+        return codeExecutionService.runTestcasesWithCode(questionId, testcaseInputs, code);
     }
 
     @MutationMapping(name = "submitAttempt")

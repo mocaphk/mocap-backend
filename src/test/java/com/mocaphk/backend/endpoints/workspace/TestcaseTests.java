@@ -10,7 +10,6 @@ import org.springframework.test.context.ActiveProfiles;
 import com.mocaphk.backend.endpoints.mocap.workspace.controller.TestcaseController;
 import com.mocaphk.backend.endpoints.mocap.workspace.model.CustomTestcase;
 import com.mocaphk.backend.endpoints.mocap.workspace.model.Testcase;
-import com.mocaphk.backend.endpoints.mocap.workspace.model.TestcaseInputEntry;
 
 import java.util.List;
 
@@ -25,19 +24,27 @@ public class TestcaseTests {
     private static final String TEST_STUDENT_USER_ID = "2590f78f-ac87-4dc1-ba3a-d8ffb7189c39";
 
     @Test
-    public void testCreateTestcases() {
-         List<Testcase> testcases = testcaseController.createTestcases(
+    public void testCreateAndUpdateTestcases() {
+         List<Testcase> testcases = testcaseController.createAndUpdateTestcases(
                  1L,
                  List.of(
-                         new CreateTestcaseInput(
+                         new CreateAndUpdateTestcaseInput(
+                                 null,
                                  List.of(new TestcaseInputEntryInput("foo", "bar")),
                                  null,
                                  false
+                         ),
+                         new CreateAndUpdateTestcaseInput(
+                                1L,
+                                List.of(new TestcaseInputEntryInput("foo2", "bar2")),
+                                null,
+                                false
                          )
                  )
          );
         assertThat(testcases.get(0).getId()).isNotNull();
         assertThat(testcases.get(0).getQuestionId()).isEqualTo(1L);
+        assertThat(testcases.get(1).getId()).isEqualTo(1L);
     }
 
     @Test
@@ -79,19 +86,6 @@ public class TestcaseTests {
     }
 
     @Test
-    public void testUpdateTestcase() {
-        Testcase testcase = testcaseController.updateTestcase(
-                1L,
-                new UpdateTestcaseInput(
-                        List.of(new TestcaseInputEntryInput("foo2", "bar2")),
-                        null,
-                        false
-                )
-        );
-        assertThat(testcase.getId()).isEqualTo(1L);
-    }
-
-    @Test
     public void testUpdateCustomTestcase() {
         CustomTestcase testcase = testcaseController.updateCustomTestcase(
                 2L,
@@ -104,10 +98,11 @@ public class TestcaseTests {
 
     @Test
     public void testDeleteTestcase() {
-        List<Testcase> testcases = testcaseController.createTestcases(
+        List<Testcase> testcases = testcaseController.createAndUpdateTestcases(
                 1L,
                 List.of(
-                        new CreateTestcaseInput(
+                        new CreateAndUpdateTestcaseInput(
+                                null,
                                 List.of(new TestcaseInputEntryInput("foo", "bar")),
                                 null,
                                 false

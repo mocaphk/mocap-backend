@@ -5,16 +5,12 @@ import com.mocaphk.backend.endpoints.mocap.workspace.repository.BaseTestcaseRepo
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.mocaphk.backend.endpoints.mocap.workspace.dto.CreateCustomTestcaseInput;
-import com.mocaphk.backend.endpoints.mocap.workspace.dto.CreateTestcaseInput;
+import com.mocaphk.backend.endpoints.mocap.workspace.dto.CreateAndUpdateTestcaseInput;
 import com.mocaphk.backend.endpoints.mocap.workspace.dto.UpdateCustomTestcaseInput;
-import com.mocaphk.backend.endpoints.mocap.workspace.dto.UpdateTestcaseInput;
 import com.mocaphk.backend.endpoints.mocap.workspace.repository.CustomTestcaseRepository;
-import com.mocaphk.backend.endpoints.mocap.workspace.repository.QuestionRepository;
 import com.mocaphk.backend.endpoints.mocap.workspace.repository.TestcaseRepository;
 
 import java.util.ArrayList;
@@ -28,7 +24,6 @@ public class TestcaseService {
     private final BaseTestcaseRepository baseTestcaseRepository;
     private final TestcaseRepository testcaseRepository;
     private final CustomTestcaseRepository customTestcaseRepository;
-    private final QuestionRepository questionRepository;
 
     public BaseTestcase getBaseTestcaseById(Long id) {
         return baseTestcaseRepository.findById(id).orElse(null);
@@ -50,18 +45,40 @@ public class TestcaseService {
         return customTestcaseRepository.findByUserIdAndQuestionId(userId, questionId);
     }
 
-    public List<Testcase> createTestcases(Long questionId, List<CreateTestcaseInput> inputs) {
+    public List<Testcase> createAndUpdateTestcases(Long questionId, List<CreateAndUpdateTestcaseInput> inputs) {
+        List<Testcase> oldTestcases = getTestcasesByQuestionId(questionId);
         List<Testcase> testcases = new ArrayList<>();
-        for (CreateTestcaseInput input : inputs) {
-            Testcase testcase = new Testcase();
-            testcase.setInput(input.input().stream()
-                    .map(i -> new TestcaseInputEntry(i.name(), i.value()))
-                    .collect(Collectors.toList()));
-            testcase.setQuestionId(questionId);
-            testcase.setExpectedOutput(input.expectedOutput());
-            testcase.setIsHidden(input.isHidden());
+        for (CreateAndUpdateTestcaseInput input : inputs) {
+            Testcase testcase;
+            if (input.id() == null) {
+                testcase = new Testcase();
+                testcase.setInput(input.input().stream()
+                        .map(i -> new TestcaseInputEntry(i.name(), i.value()))
+                        .collect(Collectors.toList()));
+                testcase.setQuestionId(questionId);
+                testcase.setExpectedOutput(input.expectedOutput());
+                testcase.setIsHidden(input.isHidden());
+            } else {
+                testcase = getTestcaseById(input.id());
+                if (testcase == null || !testcase.getQuestionId().equals(questionId)) {
+                    continue;
+                }
+                oldTestcases.remove(testcase);
+                if (!input.input().isEmpty()) {
+                    testcase.setInput(input.input().stream()
+                            .map(i -> new TestcaseInputEntry(i.name(), i.value()))
+                            .collect(Collectors.toList()));
+                }
+                if (StringUtils.isNotBlank(input.expectedOutput())) {
+                    testcase.setExpectedOutput(input.expectedOutput());
+                }
+                if (input.isHidden() != null) {
+                    testcase.setIsHidden(input.isHidden());
+                }
+            }
             testcases.add(testcase);
         }
+        testcaseRepository.deleteAll(oldTestcases);
         testcaseRepository.saveAll(testcases);
         return testcases;
     }
@@ -79,27 +96,6 @@ public class TestcaseService {
         }
         customTestcaseRepository.saveAll(customTestcases);
         return customTestcases;
-    }
-
-    public Testcase updateTestcase(Long id, UpdateTestcaseInput input) {
-        Testcase testcase = getTestcaseById(id);
-        if (testcase == null) {
-            return null;
-        }
-
-        if (!input.input().isEmpty()) {
-            testcase.setInput(input.input().stream()
-                    .map(i -> new TestcaseInputEntry(i.name(), i.value()))
-                    .collect(Collectors.toList()));
-        }
-        if (StringUtils.isNotBlank(input.expectedOutput())) {
-            testcase.setExpectedOutput(input.expectedOutput());
-        }
-        if (input.isHidden() != null) {
-            testcase.setIsHidden(input.isHidden());
-        }
-        testcaseRepository.save(testcase);
-        return testcase;
     }
 
     public CustomTestcase updateCustomTestcase(Long id, UpdateCustomTestcaseInput input) {

@@ -64,7 +64,8 @@ public class CodeExecutionTests {
                         "python {mainFile}",
                         1000,
                         // TODO: remove this hard-coded value
-                        1L
+                        1L,
+                        false
                 )
         );
         assertThat(question.getId()).isNotNull();
@@ -84,12 +85,12 @@ public class CodeExecutionTests {
         );
         assertThat(attempt.getId()).isNotNull();
 
-        AttemptResult result1 = codeExecutionService.runAttempt(attempt.getId());
+        AttemptResult result1 = codeExecutionService.runAttempt(attempt.getId(), null);
         assertThat(result1.getResults().size()).isEqualTo(1);
 
         CodeExecutionResult codeExecutionResult1 = result1.getResults().get(0);
         assertThat(codeExecutionResult1.getAttemptResultId()).isEqualTo(result1.getId());
-        assertThat(codeExecutionResult1.getInput()).isNull();
+        assertThat(codeExecutionResult1.getInput()).isEmpty();
         assertThat(codeExecutionResult1.getOutput().size()).isEqualTo(1);
         assertThat(codeExecutionResult1.getSampleOutput().size()).isEqualTo(1);
         assertThat(codeExecutionResult1.getIsExecutionSuccess()).isTrue();
@@ -111,12 +112,12 @@ public class CodeExecutionTests {
                 )
         );
 
-        AttemptResult result2 = codeExecutionService.runAttempt(attempt.getId());
+        AttemptResult result2 = codeExecutionService.runAttempt(attempt.getId(), null);
         assertThat(result2.getResults().size()).isEqualTo(1);
 
         CodeExecutionResult codeExecutionResult2 = result2.getResults().get(0);
         assertThat(codeExecutionResult2.getAttemptResultId()).isEqualTo(result2.getId());
-        assertThat(codeExecutionResult2.getInput()).isNull();
+        assertThat(codeExecutionResult2.getInput()).isEmpty();
         assertThat(codeExecutionResult2.getOutput().size()).isEqualTo(1);
         assertThat(codeExecutionResult2.getSampleOutput().size()).isEqualTo(1);
         assertThat(codeExecutionResult2.getIsExecutionSuccess()).isTrue();
@@ -135,15 +136,17 @@ public class CodeExecutionTests {
     @Test
     public void testRunAttemptWithTestcases() throws IOException {
         Question question = createTestQuestion("x = input(\"Enter a number: \")\nprint(\"You entered:\", x)\n");
-        testcaseService.createTestcases(
+        testcaseService.createAndUpdateTestcases(
                 question.getId(),
                 List.of(
-                        new CreateTestcaseInput(
+                        new CreateAndUpdateTestcaseInput(
+                                null,
                                 List.of(new TestcaseInputEntryInput("x", "123")),
                                 null,
                                 false
                         ),
-                        new CreateTestcaseInput(
+                        new CreateAndUpdateTestcaseInput(
+                                null,
                                 List.of(new TestcaseInputEntryInput("x", "456")),
                                 null,
                                 true
@@ -173,7 +176,23 @@ public class CodeExecutionTests {
         );
         assertThat(attempt.getId()).isNotNull();
 
-        AttemptResult result1 = codeExecutionService.runAttempt(attempt.getId());
+        AttemptResult result1 = codeExecutionService.runAttempt(
+                attempt.getId(),
+                List.of(
+                        List.of(
+                                new TestcaseInputEntryInput("x", "123")
+                        ),
+                        List.of(
+                                new TestcaseInputEntryInput("x", "456")
+                        ),
+                        List.of(
+                                new TestcaseInputEntryInput("x", "789")
+                        ),
+                        List.of(
+                                new TestcaseInputEntryInput("x", "101112")
+                        )
+                )
+        );
         assertThat(result1.getResults().size()).isEqualTo(4);
 
         List<String> outputs = new ArrayList<>();
@@ -212,7 +231,23 @@ public class CodeExecutionTests {
                 )
         );
 
-        AttemptResult result2 = codeExecutionService.runAttempt(attempt.getId());
+        AttemptResult result2 = codeExecutionService.runAttempt(
+                attempt.getId(),
+                List.of(
+                        List.of(
+                                new TestcaseInputEntryInput("x", "123")
+                        ),
+                        List.of(
+                                new TestcaseInputEntryInput("x", "456")
+                        ),
+                        List.of(
+                                new TestcaseInputEntryInput("x", "789")
+                        ),
+                        List.of(
+                                new TestcaseInputEntryInput("x", "101112")
+                        )
+                )
+        );
         assertThat(result2.getResults().size()).isEqualTo(4);
 
         for (CodeExecutionResult codeExecutionResult : result2.getResults()) {
@@ -236,21 +271,6 @@ public class CodeExecutionTests {
     @Test
     public void testRunTestcase() throws IOException {
         Question question = createTestQuestion("x = input(\"Enter a number: \")\nprint(\"You entered:\", x)\n");
-        List<Testcase> testcases = testcaseService.createTestcases(
-                question.getId(),
-                List.of(
-                        new CreateTestcaseInput(
-                                List.of(new TestcaseInputEntryInput("x", "123")),
-                                null,
-                                false
-                        ),
-                        new CreateTestcaseInput(
-                                List.of(new TestcaseInputEntryInput("x", "456")),
-                                null,
-                                true
-                        )
-                )
-        );
 
         Attempt attempt = attemptService.createAttempt(
                 TEST_STUDENT_USER_ID,
@@ -261,7 +281,12 @@ public class CodeExecutionTests {
         );
         assertThat(attempt.getId()).isNotNull();
 
-        CodeExecutionResult result1 = codeExecutionService.runTestcase(attempt.getId(), testcases.get(0).getId());
+        CodeExecutionResult result1 = codeExecutionService.runTestcase(
+                attempt.getId(),
+                List.of(
+                        new TestcaseInputEntryInput("x", "123")
+                )
+        );
 
         assertThat(result1.getInput().size()).isEqualTo(1);
         // async execution with stdin, so the number of output fragments created is not guaranteed
@@ -289,7 +314,12 @@ public class CodeExecutionTests {
                 )
         );
 
-        CodeExecutionResult result2 = codeExecutionService.runTestcase(attempt.getId(), testcases.get(0).getId());
+        CodeExecutionResult result2 = codeExecutionService.runTestcase(
+                attempt.getId(),
+                List.of(
+                        new TestcaseInputEntryInput("x", "123")
+                )
+        );
 
         assertThat(result2.getInput().size()).isEqualTo(1);
         assertThat(result2.getOutput().size()).isEqualTo(1);
@@ -309,15 +339,17 @@ public class CodeExecutionTests {
     @Test
     public void testSubmitAttempt() throws IOException {
         Question question = createTestQuestion("x = input(\"Enter a number: \")\nprint(\"You entered:\", x)\n");
-        testcaseService.createTestcases(
+        testcaseService.createAndUpdateTestcases(
                 question.getId(),
                 List.of(
-                        new CreateTestcaseInput(
+                        new CreateAndUpdateTestcaseInput(
+                                null,
                                 List.of(new TestcaseInputEntryInput("x", "123")),
                                 null,
                                 false
                         ),
-                        new CreateTestcaseInput(
+                        new CreateAndUpdateTestcaseInput(
+                                null,
                                 List.of(new TestcaseInputEntryInput("x", "456")),
                                 null,
                                 true
