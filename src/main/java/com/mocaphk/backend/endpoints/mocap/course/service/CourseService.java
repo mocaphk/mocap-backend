@@ -18,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -39,7 +40,16 @@ public class CourseService {
             return null;
         }
 
-        return courseRepository.findById(id).orElse(null);
+        Course course = courseRepository.findById(id).orElse(null);
+
+        if (course == null) {
+            return null;
+        }
+
+        course.getAnnouncements().sort(Comparator.comparing(Announcement::getUpdatedAt).reversed());
+        course.getAssignments().sort(Comparator.comparing(Assignment::getDateDue).reversed());
+
+        return course;
     }
 
     public List<String> getCodes() {
