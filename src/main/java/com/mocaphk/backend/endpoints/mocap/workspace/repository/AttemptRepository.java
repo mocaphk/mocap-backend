@@ -14,4 +14,6 @@ public interface AttemptRepository extends JpaRepository<Attempt, Long> {
     List<Attempt> findTop5ByUserIdAndQuestionIdAndIsSubmittedTrueOrderByUpdatedAtDesc(String userId, Long questionId);
 
     Attempt findFirstByUserIdAndQuestionIdAndIsSubmittedTrueOrderByUpdatedAtDesc(String userId, Long questionId);
+
+    Attempt findFirstByUserIdAndQuestionIdOrderByUpdatedAtDesc(String userId, Long questionId);
 }

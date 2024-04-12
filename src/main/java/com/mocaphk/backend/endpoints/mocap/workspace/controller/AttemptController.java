@@ -36,6 +36,15 @@ public class AttemptController {
         return attemptService.getAttemptsByQuestionId(authentication.getName() , questionId);
     }
 
+    @QueryMapping(name = "latestUpdate")
+    public Attempt getLatestUpdate(Authentication authentication, @Argument Long questionId) {
+        log.debug("getLatestUpdate: {}", questionId);
+        if (!authentication.isAuthenticated()) {
+            return null;
+        }
+        return attemptService.getLatestUpdateByQuestionId(authentication.getName(), questionId);
+    }
+
     @QueryMapping(name = "latestSubmission")
     public Attempt getLatestSubmission(@Argument String userId, @Argument Long questionId) {
         log.debug("getLatestSubmission: {}, {}", userId, questionId);
