@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 
 @Entity
 @NoArgsConstructor
@@ -29,7 +30,7 @@ public class Testcase extends BaseTestcase {
         }
         if (getQuestion().getCheckingMethod() == CheckingMethod.CONSOLE) {
             String output = combineOutput(result.getOutput());
-            if (output.equals(getExpectedOutput())) {
+            if (StringUtils.isNotBlank(getExpectedOutput()) && output.equals(getExpectedOutput())) {
                 result.setIsCorrect(true);
                 return true;
             }

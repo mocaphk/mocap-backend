@@ -312,6 +312,7 @@ public class CodeExecutionService {
         try {
             if (!resultCallback.awaitStarted(MAX_START_EXECUTION_TIME, TimeUnit.MILLISECONDS)) {
                 log.error("Could not start execution within time limit");
+                result.setOutput(output);
                 return result;
             }
 
@@ -324,6 +325,7 @@ public class CodeExecutionService {
             }
 
             if (!resultCallback.awaitCompletion(question.getTimeLimit(), TimeUnit.MILLISECONDS)) {
+                result.setOutput(output);
                 return result;
             }
         } catch (Exception e) {
