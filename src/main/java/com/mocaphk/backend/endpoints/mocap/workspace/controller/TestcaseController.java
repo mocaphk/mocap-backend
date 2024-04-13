@@ -43,6 +43,12 @@ public class TestcaseController {
         return testcaseService.getTestcasesByQuestionId(questionId);
     }
 
+    @QueryMapping(name = "nonHiddenTestcases")
+    public List<Testcase> getNonHiddenTestcaseByQuestionId(@Argument Long questionId) {
+        log.debug("getNonHiddenTestcaseById: {}", questionId);
+        return testcaseService.getNonHiddenTestcasesByQuestionId(questionId);
+    }
+
     @QueryMapping(name = "customTestcases")
     public List<CustomTestcase> getCustomTestcasesByQuestionId(Authentication authentication, @Argument Long questionId) {
         log.debug("getCustomTestcasesByQuestionId: {}", questionId);
