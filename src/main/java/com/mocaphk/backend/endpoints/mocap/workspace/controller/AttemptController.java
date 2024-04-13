@@ -7,7 +7,7 @@ import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
-
+import com.mocaphk.backend.endpoints.mocap.user.dto.GetUserOutput;
 import com.mocaphk.backend.endpoints.mocap.workspace.dto.CreateAttemptInput;
 import com.mocaphk.backend.endpoints.mocap.workspace.dto.UpdateAttemptInput;
 import com.mocaphk.backend.endpoints.mocap.workspace.model.Attempt;
@@ -69,4 +69,11 @@ public class AttemptController {
         log.debug("updateAttempt: {}, {}", attemptId, attemptInput);
         return attemptService.updateAttempt(attemptId, attemptInput);
     }
+
+    @QueryMapping(name = "submittedStudents")
+    public List<GetUserOutput> getSubmittedStudent(@Argument Long questionId){
+        log.debug("getSubmittedUser: {}", questionId);
+        return attemptService.getSubmittedStudents(questionId);
+    }
+
 }

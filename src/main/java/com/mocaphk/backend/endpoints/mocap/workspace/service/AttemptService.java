@@ -4,7 +4,8 @@ import com.mocaphk.backend.utils.DateUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
+import com.mocaphk.backend.endpoints.mocap.user.dto.GetUserOutput;
+import com.mocaphk.backend.endpoints.mocap.user.model.MocapUser;
 import com.mocaphk.backend.endpoints.mocap.workspace.dto.CreateAttemptInput;
 import com.mocaphk.backend.endpoints.mocap.workspace.dto.UpdateAttemptInput;
 import com.mocaphk.backend.endpoints.mocap.workspace.model.Attempt;
@@ -60,5 +61,12 @@ public class AttemptService {
         attempt.setCode(input.code());
         attemptRepository.save(attempt);
         return attempt;
+    }
+
+    public List<GetUserOutput> getSubmittedStudents(Long questionId){
+        List<MocapUser> users = attemptRepository.findDistinctUsersBySubmittedAttempts(questionId);
+        log.debug("{}", users);
+        return users.stream().map(user -> new GetUserOutput(user.getId(), user.getUsername())).toList();
+
     }
 }
