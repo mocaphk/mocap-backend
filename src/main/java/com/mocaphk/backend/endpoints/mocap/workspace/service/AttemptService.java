@@ -64,9 +64,11 @@ public class AttemptService {
     }
 
     public List<GetUserOutput> getSubmittedStudents(Long questionId){
-        List<MocapUser> users = attemptRepository.findDistinctUsersBySubmittedAttempts(questionId);
-        log.debug("{}", users);
-        return users.stream().map(user -> new GetUserOutput(user.getId(), user.getUsername())).toList();
-
+        List<MocapUser> students = attemptRepository.findDistinctUsersBySubmittedAttempts(questionId);
+        List<GetUserOutput> sortedStudents = students.stream()
+                .sorted(Comparator.comparing(MocapUser::getUsername))
+                .map(user -> new GetUserOutput(user.getId(), user.getUsername()))
+                .toList();
+        return sortedStudents;
     }
 }
