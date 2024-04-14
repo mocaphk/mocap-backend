@@ -13,8 +13,8 @@ keycloak:
 
 docker:
     host: "unix:///var/run/docker.sock"
-    tempDockerfileDir: "/tmp/files/dockerfiles"
-    tempSourceDir: "/tmp/files/source"
+    tempDockerfileDir: "/app/temp/dockerfiles"
+    tempSourceDir: "/app/temp/sources"
 
 spring:
     security:
