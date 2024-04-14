@@ -17,8 +17,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
@@ -227,7 +226,18 @@ public class CodeExecutionService {
                 testcase.check(result, sampleResult);
                 result.setSampleOutput(sampleResult.getOutput());
                 result.setAttemptResultId(attemptResult.getId());
+
                 codeExecutionResultRepository.save(result);
+
+                // hide the testcase input if it is hidden
+                if (testcase.getIsHidden()) {
+                    List<TestcaseInputEntry> emptyInputList = new ArrayList<>();
+                    List<CodeExecutionResult.CodeExecutionOutput> emptyResultList = new ArrayList<>();
+                    result.setInput(emptyInputList);
+                    result.setOutput(emptyResultList);
+                    result.setSampleOutput(emptyResultList);
+                }
+
                 results.add(result);
             }
         } finally {

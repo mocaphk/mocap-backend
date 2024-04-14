@@ -14,6 +14,7 @@ import com.mocaphk.backend.endpoints.mocap.workspace.repository.CustomTestcaseRe
 import com.mocaphk.backend.endpoints.mocap.workspace.repository.TestcaseRepository;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,7 +39,14 @@ public class TestcaseService {
     }
 
     public List<Testcase> getTestcasesByQuestionId(Long questionId) {
-        return testcaseRepository.findByQuestionId(questionId);
+        List<Testcase> testcases = testcaseRepository.findByQuestionId(questionId);
+        return testcases.stream()
+                .sorted(Comparator.comparing(Testcase::getId))
+                .collect(Collectors.toList());
+    }
+
+    public List<Testcase> getNonHiddenTestcasesByQuestionId(Long questionId) {
+        return testcaseRepository.findByQuestionIdAndIsHiddenFalse(questionId);
     }
 
     public List<CustomTestcase> getCustomTestcasesByQuestionId(String userId, Long questionId) {
