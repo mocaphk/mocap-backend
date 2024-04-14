@@ -38,12 +38,12 @@ public class AnnouncementService {
     }
 
     public List<Announcement> getAnnouncementsByCourseId(Long courseId) {
-        return announcementRepository.findByCourseId(courseId);
+        return announcementRepository.findByCourseIdOrderByUpdatedAtDesc(courseId);
     }
 
     public List<Announcement> getAnnouncementsByUserId(String userId) {
         List<Course> courses = courseUserService.getCoursesByUserId(userId);
-        return announcementRepository.findByCourseIdIn(courses.stream().map(Course::getId).toList());
+        return announcementRepository.findByCourseIdInOrderByUpdatedAtDesc(courses.stream().map(Course::getId).toList());
     }
 
     public Announcement createAnnouncement(String userId, CreateAnnouncementInput input) {
