@@ -33,6 +33,7 @@ public class Attempt {
     @JoinColumn(name = "question_id", insertable = false, updatable = false)
     private Question question;
 
+    @Column(columnDefinition = "TEXT")
     private String code;
 
     private Boolean isSubmitted;

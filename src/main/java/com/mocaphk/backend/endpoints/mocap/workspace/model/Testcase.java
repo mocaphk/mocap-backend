@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 @Getter
 @Setter
 public class Testcase extends BaseTestcase {
+    @Column(columnDefinition = "TEXT")
     private String expectedOutput;
 
     private Boolean isHidden;

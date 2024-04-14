@@ -22,8 +22,10 @@ public class Course {
 
     private String code;
 
+    @Column(columnDefinition = "TEXT")
     private String name;
 
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     private String year;
