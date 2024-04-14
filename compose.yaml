@@ -12,9 +12,12 @@ services:
             - .env.production.local
         networks:
             - mocap
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
         ports:
             - 8000:8080
         restart: always
+        privileged: true
         command: java -jar app.jar
 networks:
     mocap:
