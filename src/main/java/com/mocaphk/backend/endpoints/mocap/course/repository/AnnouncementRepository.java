@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface AnnouncementRepository extends JpaRepository<Announcement, Long> {
-    List<Announcement> findByCourseId(Long courseId);
+    List<Announcement> findByCourseIdOrderByUpdatedAtDesc(Long courseId);
 
-    List<Announcement> findByCourseIdIn(Collection<Long> courseIds);
+    List<Announcement> findByCourseIdInOrderByUpdatedAtDesc(Collection<Long> courseIds);
 }
