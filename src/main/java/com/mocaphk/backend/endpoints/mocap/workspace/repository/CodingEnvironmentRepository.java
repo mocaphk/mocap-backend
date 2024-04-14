@@ -10,5 +10,5 @@ import java.util.List;
 @Repository
 public interface CodingEnvironmentRepository extends JpaRepository<CodingEnvironment, Long> {
 
-    List<CodingEnvironment> findByCourse_Assignments_IdOrCourseIdNull(Long id);
+    List<CodingEnvironment> findByIsBuiltTrueAndCourse_Assignments_IdOrCourseIdNullOrderByNameAsc(Long id);
 }

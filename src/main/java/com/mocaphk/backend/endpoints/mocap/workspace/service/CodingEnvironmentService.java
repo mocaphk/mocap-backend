@@ -28,7 +28,7 @@ public class CodingEnvironmentService {
     }
 
     public List<CodingEnvironment> getCodingEnvironmentByAssignmentId(Long id) {
-        return codingEnvironmentRepository.findByCourse_Assignments_IdOrCourseIdNull(id);
+        return codingEnvironmentRepository.findByIsBuiltTrueAndCourse_Assignments_IdOrCourseIdNullOrderByNameAsc(id);
     }
 
     public CodingEnvironment createCodingEnvironment(CreateCodingEnvironmentInput input) {
