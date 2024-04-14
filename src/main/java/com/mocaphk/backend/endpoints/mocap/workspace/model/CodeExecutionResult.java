@@ -20,6 +20,7 @@ public class CodeExecutionResult {
     @Getter
     @Setter
     public static class CodeExecutionOutput {
+        @Column(columnDefinition = "TEXT")
         private String payload;
 
         @Enumerated(EnumType.STRING)

@@ -20,13 +20,16 @@ public class Question {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(columnDefinition = "TEXT")
     private String title;
 
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Enumerated(EnumType.STRING)
     private ProgrammingLanguage language;
 
+    @Column(columnDefinition = "TEXT")
     private String sampleCode;
 
     @Enumerated(EnumType.STRING)
@@ -39,6 +42,7 @@ public class Question {
     @JoinColumn(name = "coding_environment_id", insertable = false, updatable = false)
     private CodingEnvironment codingEnvironment;
 
+    @Column(columnDefinition = "TEXT")
     private String execCommand;
 
     private Integer timeLimit;
