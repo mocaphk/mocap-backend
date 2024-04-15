@@ -6,10 +6,11 @@ COPY . .
 
 RUN gradle build -x test --stacktrace
 
-
 FROM eclipse-temurin:17-jdk-alpine
 
 WORKDIR /app
+
+RUN ln -fs /usr/share/zoneinfo/Asia/Hong_Kong /etc/localtime
 
 # Install docker
 RUN apk update && apk add --no-cache docker-cli
