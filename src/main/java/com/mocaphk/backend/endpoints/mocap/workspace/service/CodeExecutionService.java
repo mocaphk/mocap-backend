@@ -66,21 +66,38 @@ public class CodeExecutionService {
             }
         }
 
-        String containerId = dockerManager.createContainer(codingEnvironment.getDockerImageId());
-        dockerManager.startContainer(containerId);
+        String studentCode = attempt.getCode();
+        if (studentCode == null) {
+            studentCode = "";
+        }
+        String sampleCode = question.getSampleCode();
+        if (sampleCode == null) {
+            sampleCode = "";
+        }
+
+        String studentContainerId = dockerManager.createContainer(codingEnvironment.getDockerImageId());
+        dockerManager.startContainer(studentContainerId);
+        String studentFileName = dockerManager.copyFileToContainer(studentContainerId, studentCode, "/");
+
+        String sampleContainerId = dockerManager.createContainer(codingEnvironment.getDockerImageId());
+        dockerManager.startContainer(sampleContainerId);
+        String sampleFileName = dockerManager.copyFileToContainer(sampleContainerId, sampleCode, "/");
+
         try {
             for (var testcase : allTestcases) {
-                CodeExecutionResult result = execute(attempt.getCode(), question, containerId, testcase);
+                CodeExecutionResult result = execute(question, studentContainerId, studentFileName, testcase);
                 attempt.setExecutedAt(DateUtils.now());
-                CodeExecutionResult sampleResult = execute(question.getSampleCode(), question, containerId, testcase);
+                CodeExecutionResult sampleResult = execute(question, sampleContainerId, sampleFileName, testcase);
                 testcase.check(result, sampleResult);
                 result.setSampleOutput(sampleResult.getOutput());
                 result.setAttemptResultId(attemptResult.getId());
                 results.add(result);
             }
         } finally {
-            dockerManager.stopContainer(containerId);
-            dockerManager.removeContainer(containerId, true);
+            dockerManager.stopContainer(studentContainerId);
+            dockerManager.removeContainer(studentContainerId, true);
+            dockerManager.stopContainer(sampleContainerId);
+            dockerManager.removeContainer(sampleContainerId, true);
         }
         attemptResult.setResults(results);
 
@@ -106,14 +123,32 @@ public class CodeExecutionService {
 
         CodeExecutionResult result;
         CodeExecutionResult sampleResult;
-        String containerId = dockerManager.createContainer(codingEnvironment.getDockerImageId());
-        dockerManager.startContainer(containerId);
+
+        String studentCode = attempt.getCode();
+        if (studentCode == null) {
+            studentCode = "";
+        }
+        String sampleCode = question.getSampleCode();
+        if (sampleCode == null) {
+            sampleCode = "";
+        }
+
+        String studentContainerId = dockerManager.createContainer(codingEnvironment.getDockerImageId());
+        dockerManager.startContainer(studentContainerId);
+        String studentFileName = dockerManager.copyFileToContainer(studentContainerId, studentCode, "/");
+
+        String sampleContainerId = dockerManager.createContainer(codingEnvironment.getDockerImageId());
+        dockerManager.startContainer(sampleContainerId);
+        String sampleFileName = dockerManager.copyFileToContainer(sampleContainerId, sampleCode, "/");
+
         try {
-            result = execute(attempt.getCode(), question, containerId, testcase);
-            sampleResult = execute(question.getSampleCode(), question, containerId, testcase);
+            result = execute(question, studentContainerId, studentFileName, testcase);
+            sampleResult = execute(question, sampleContainerId, sampleFileName, testcase);
         } finally {
-            dockerManager.stopContainer(containerId);
-            dockerManager.removeContainer(containerId, true);
+            dockerManager.stopContainer(studentContainerId);
+            dockerManager.removeContainer(studentContainerId, true);
+            dockerManager.stopContainer(sampleContainerId);
+            dockerManager.removeContainer(sampleContainerId, true);
         }
         testcase.check(result, sampleResult);
         result.setSampleOutput(sampleResult.getOutput());
@@ -137,10 +172,17 @@ public class CodeExecutionService {
         testcase.setInput(testcaseInput.stream().map(i -> new TestcaseInputEntry(i.name(), i.value())).toList());
 
         CodeExecutionResult result;
+
+        if (code == null) {
+            code = "";
+        }
+
         String containerId = dockerManager.createContainer(codingEnvironment.getDockerImageId());
         dockerManager.startContainer(containerId);
+        String fileName = dockerManager.copyFileToContainer(containerId, code, "/");
+
         try {
-            result = execute(code, question, containerId, testcase);
+            result = execute(question, containerId, fileName, testcase);
         } finally {
             dockerManager.stopContainer(containerId);
             dockerManager.removeContainer(containerId, true);
@@ -175,11 +217,18 @@ public class CodeExecutionService {
         attemptResult.setCreatedAt(DateUtils.now());
 
         List<CodeExecutionResult> results = new ArrayList<>();
+
+        if (code == null) {
+            code = "";
+        }
+
         String containerId = dockerManager.createContainer(codingEnvironment.getDockerImageId());
         dockerManager.startContainer(containerId);
+        String fileName = dockerManager.copyFileToContainer(containerId, code, "/");
+
         try {
             for (var testcase : allTestcases) {
-                CodeExecutionResult result = execute(code, question, containerId, testcase);
+                CodeExecutionResult result = execute(question, containerId, fileName, testcase);
                 result.setSampleOutput(result.getOutput());
                 results.add(result);
             }
@@ -216,13 +265,29 @@ public class CodeExecutionService {
         }
 
         List<CodeExecutionResult> results = new ArrayList<>();
-        String containerId = dockerManager.createContainer(codingEnvironment.getDockerImageId());
-        dockerManager.startContainer(containerId);
+
+        String studentCode = attempt.getCode();
+        if (studentCode == null) {
+            studentCode = "";
+        }
+        String sampleCode = question.getSampleCode();
+        if (sampleCode == null) {
+            sampleCode = "";
+        }
+
+        String studentContainerId = dockerManager.createContainer(codingEnvironment.getDockerImageId());
+        dockerManager.startContainer(studentContainerId);
+        String studentFileName = dockerManager.copyFileToContainer(studentContainerId, studentCode, "/");
+
+        String sampleContainerId = dockerManager.createContainer(codingEnvironment.getDockerImageId());
+        dockerManager.startContainer(sampleContainerId);
+        String sampleFileName = dockerManager.copyFileToContainer(sampleContainerId, sampleCode, "/");
+
         try {
             for (var testcase : allTestcases) {
-                CodeExecutionResult result = execute(attempt.getCode(), question, containerId, testcase);
+                CodeExecutionResult result = execute(question, studentContainerId, studentFileName, testcase);
                 attempt.setExecutedAt(DateUtils.now());
-                CodeExecutionResult sampleResult = execute(question.getSampleCode(), question, containerId, testcase);
+                CodeExecutionResult sampleResult = execute(question, sampleContainerId, sampleFileName, testcase);
                 testcase.check(result, sampleResult);
                 result.setSampleOutput(sampleResult.getOutput());
                 result.setAttemptResultId(attemptResult.getId());
@@ -241,8 +306,10 @@ public class CodeExecutionService {
                 results.add(result);
             }
         } finally {
-            dockerManager.stopContainer(containerId);
-            dockerManager.removeContainer(containerId, true);
+            dockerManager.stopContainer(studentContainerId);
+            dockerManager.removeContainer(studentContainerId, true);
+            dockerManager.stopContainer(sampleContainerId);
+            dockerManager.removeContainer(sampleContainerId, true);
         }
         attempt.setIsSubmitted(true);
         attemptResult.setResults(results);
@@ -253,25 +320,19 @@ public class CodeExecutionService {
     /**
      * Execute code without checking the result
      *
-     * @param code The code to be executed
      * @param question The question that the code is for
      * @param containerId The container ID to execute the code
+     * @param fileName The file name of the code
      * @param testcase The testcase to be executed
      * @return The result of the execution
      * @throws IOException
      */
     public CodeExecutionResult execute(
-            String code,
             Question question,
             String containerId,
+            String fileName,
             BaseTestcase testcase
     ) throws IOException {
-        if (StringUtils.isBlank(code)) {
-            return null;
-        }
-
-        String fileName = dockerManager.copyFileToContainer(containerId, code, "/");
-
         CodeExecutionResult result = new CodeExecutionResult();
         result.setInput(new ArrayList<>());
         if (testcase != null && testcase.getInput() != null) {
