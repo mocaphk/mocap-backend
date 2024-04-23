@@ -386,13 +386,20 @@ public class CodeExecutionTests {
         List<String> outputs = new ArrayList<>();
         for (CodeExecutionResult codeExecutionResult : result1.getResults()) {
             assertThat(codeExecutionResult.getAttemptResultId()).isEqualTo(result1.getId());
-            assertThat(codeExecutionResult.getInput().size()).isEqualTo(1);
+            // hidden testcase does not have input data, so input is either 0 or 1
+            assertThat(codeExecutionResult.getInput().size()).satisfiesAnyOf(
+                    res -> assertThat(res).isEqualTo(0),
+                    res -> assertThat(res).isEqualTo(1)
+            );
+            // hidden testcase does not have output or sample output data on submit
             // async execution with stdin, so the number of output fragments created is not guaranteed
             assertThat(codeExecutionResult.getOutput().size()).satisfiesAnyOf(
+                    res -> assertThat(res).isEqualTo(0),
                     res -> assertThat(res).isEqualTo(1),
                     res -> assertThat(res).isEqualTo(2)
             );
             assertThat(codeExecutionResult.getSampleOutput().size()).satisfiesAnyOf(
+                    res -> assertThat(res).isEqualTo(0),
                     res -> assertThat(res).isEqualTo(1),
                     res -> assertThat(res).isEqualTo(2)
             );
@@ -407,7 +414,7 @@ public class CodeExecutionTests {
         }
         assertThat(outputs).containsExactly(
                 "Enter a number: You entered: 123\n",
-                "Enter a number: You entered: 456\n"
+                ""
         );
 
         Attempt attempt2 = attemptService.createAttempt(
@@ -425,9 +432,16 @@ public class CodeExecutionTests {
 
         for (CodeExecutionResult codeExecutionResult : result2.getResults()) {
             assertThat(codeExecutionResult.getAttemptResultId()).isEqualTo(result2.getId());
-            assertThat(codeExecutionResult.getInput().size()).isEqualTo(1);
-            assertThat(codeExecutionResult.getOutput().size()).isEqualTo(1);
+            assertThat(codeExecutionResult.getInput().size()).satisfiesAnyOf(
+                    res -> assertThat(res).isEqualTo(0),
+                    res -> assertThat(res).isEqualTo(1)
+            );
+            assertThat(codeExecutionResult.getOutput().size()).satisfiesAnyOf(
+                    res -> assertThat(res).isEqualTo(0),
+                    res -> assertThat(res).isEqualTo(1)
+            );
             assertThat(codeExecutionResult.getSampleOutput().size()).satisfiesAnyOf(
+                    res -> assertThat(res).isEqualTo(0),
                     res -> assertThat(res).isEqualTo(1),
                     res -> assertThat(res).isEqualTo(2)
             );
@@ -435,6 +449,9 @@ public class CodeExecutionTests {
             assertThat(codeExecutionResult.getIsCorrect()).isFalse();
             assertThat(codeExecutionResult.getIsExceedTimeLimit()).isFalse();
 
+            if (codeExecutionResult.getInput().isEmpty()) {
+                continue;
+            }
             CodeExecutionResult.CodeExecutionOutput output = codeExecutionResult.getOutput().get(0);
             assertThat(output.getStreamType()).isEqualTo(CodeStream.STDOUT);
             assertThat(output.getPayload()).isEqualTo("Bye World!\n");
